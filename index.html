@@ -1,0 +1,759 @@
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>BCMEX - Diagnóstico y Reporte BCP</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .scale-in { animation: scaleIn 0.2s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Print Specific Styles */
+        @media print {
+            @page { margin: 0.5cm; size: A4; }
+            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible !important; height: auto !important; }
+            nav, button, .no-print, #hero-section, #wizard-section, #loading-section, #inline-email-form, #name-modal, #phone-modal { display: none !important; }
+            #app-container { margin: 0; padding: 0; height: auto; overflow: visible; }
+            #results-section { 
+                position: relative !important; 
+                display: block !important; 
+                inset: auto !important; 
+                height: auto !important; 
+                overflow: visible !important; 
+                background: white;
+            }
+            .print-break-inside { break-inside: avoid; }
+            .print-container { max-width: 100% !important; padding: 0 20px !important; margin-top: 20px !important; }
+            .print-header-image { height: 150px !important; opacity: 0.5 !important; }
+            
+            h1, h2, h3 { color: #0f172a !important; }
+            p, li { color: #334155 !important; }
+        }
+    </style>
+<link type="text/css" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@24,400,0,0,50&amp;icon_names=link" rel="stylesheet"></head>
+<body class="text-slate-800 h-screen overflow-hidden flex flex-col">
+<!-- Navbar -->
+<nav class="w-full bg-white/95 backdrop-blur-md border-b border-slate-100 fixed top-0 z-50 h-20 flex items-center justify-between px-6 lg:px-12 shadow-sm no-print">
+    <div class="flex items-center gap-3 cursor-pointer overflow-visible" onclick="resetApp()">
+        <!-- MODIFICADO: Usamos h-20 (alto total de la barra) y un zoom masivo personalizado de 250% en escritorio y 180% en móvil -->
+        <img class="h-20 w-auto object-contain transform scale-[1.8] origin-left md:scale-[2.5] transition-all" src="logo1.png" alt="Logo BCMEX" onerror="this.src='https://placehold.co/120x40?text=Logo'">
+    </div>
+    
+    <!-- BOTÓN DE CONTÁCTANOS CON SLIDE -->
+    <div class="relative">
+        <button onclick="toggleContactMenu()" id="btn-contact" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white px-6 py-2.5 rounded-full text-sm font-bold transition shadow-md flex items-center gap-2">
+            <span>Contáctanos</span>
+            <span class="material-symbols-outlined text-[18px] transition-transform duration-300" id="contact-chevron">expand_more</span>
+        </button>
+
+        <!-- Menú Desplegable (Slide) -->
+        <div id="contact-menu" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-50 scale-in origin-top-right">
+            <!-- Opción Correo -->
+            <a href="mailto:comercial@bcmex.mx" class="block p-3 hover:bg-slate-50 rounded-xl transition border-b border-slate-50 group">
+                <div class="flex items-start gap-4 text-slate-700">
+                    <div class="bg-blue-50 p-2.5 rounded-lg text-[#0ea5e9] group-hover:bg-[#0ea5e9] group-hover:text-white transition-colors duration-300">
+                        <span class="material-symbols-outlined text-xl">mail</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Escríbenos</p>
+                        <p class="text-sm font-semibold group-hover:text-[#0284c7] transition-colors">comercial@bcmex.mx</p>
+                    </div>
+                </div>
+            </a>
+            <!-- Opción Web -->
+            <a href="https://bcmex.mx/" target="_blank" class="block p-3 hover:bg-slate-50 rounded-xl transition group">
+                <div class="flex items-start gap-4 text-slate-700">
+                    <div class="bg-blue-50 p-2.5 rounded-lg text-[#0ea5e9] group-hover:bg-[#0ea5e9] group-hover:text-white transition-colors duration-300">
+                        <span class="material-symbols-outlined text-xl">public</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Visítanos</p>
+                        <p class="text-xs font-medium leading-relaxed group-hover:text-[#0284c7] transition-colors">
+                            BCMEX – Diseñamos estrategias que impulsan tu negocio
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content Area -->
+<main class="flex-1 mt-20 relative overflow-hidden flex flex-col" id="app-container">
+<!-- Hero Section -->
+<section class="absolute inset-0 z-10 flex items-center justify-center bg-slate-900" id="hero-section">
+    <div class="absolute inset-0 overflow-hidden">
+        <img alt="Background" class="w-full h-full object-cover" src="background1.png" onerror="this.src='https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070'">
+        <div class="absolute inset-0 bg-slate-900/40"></div>
+    </div>
+    <div class="relative z-20 max-w-5xl text-center px-6 flex flex-col items-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight slide-up drop-shadow-lg">
+            ¿Qué tan resiliente es tu<br class="hidden md:block">
+            negocio ante el caos?
+        </h1>
+        <div class="w-full max-w-2xl h-0.5 bg-blue-500 rounded-full mb-8 opacity-80 slide-up" style="animation-delay: 0.1s;"></div>
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 slide-up drop-shadow-md italic" style="animation-delay: 0.2s;">
+            Obtén tu puntaje de BCP en solo 2 minutos.
+        </h2>
+        <p class="text-lg md:text-xl text-slate-300 mb-12 font-light slide-up drop-shadow-md" style="animation-delay: 0.3s;">
+            Identifica brechas antes de que se conviertan en desastres.
+        </p>
+        <button class="group relative bg-gradient-to-r from-[#06b6d4] to-[#2563eb] text-white px-10 py-4 rounded-lg font-bold text-lg shadow-xl shadow-blue-900/50 hover:shadow-2xl hover:scale-105 transition-all duration-300 slide-up flex items-center gap-2" onclick="openNameModal()" style="animation-delay: 0.4s;">
+            <span>Iniciar Diagnóstico</span>
+            <span class="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">chevron_right</span>
+        </button>
+    </div>
+</section>
+
+<!-- Modal 1: Nombre del Usuario -->
+<div id="name-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl scale-in">
+        <div class="flex items-center gap-3 mb-2">
+            <span class="material-symbols-outlined text-blue-600 text-3xl">person</span>
+            <h3 class="text-2xl font-bold text-slate-900">Antes de comenzar</h3>
+        </div>
+        <p class="text-slate-500 mb-6 text-sm">Por favor, indícanos tu nombre para personalizar tu diagnóstico.</p>
+        
+        <input type="text" id="user-name-input" maxlength="40" placeholder="Ej. Juan Pérez" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-8 text-lg font-medium text-slate-700" onkeypress="handleNameKeypress(event)">
+        
+        <div class="flex justify-end gap-3">
+            <button onclick="closeNameModal()" class="px-5 py-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-xl font-medium transition">Cancelar</button>
+            <button onclick="submitNameAndStart()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition shadow-lg shadow-blue-200 flex items-center gap-2">
+                Continuar
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: Solicitar Teléfono (Opcional) -->
+<div id="phone-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl scale-in text-center relative overflow-hidden">
+        <!-- Decoración top -->
+        <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+        
+        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+            <span class="material-symbols-outlined text-3xl">phone_iphone</span>
+        </div>
+        
+        <h3 class="text-2xl font-bold text-slate-900 mb-2">Un último paso...</h3>
+        <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico para que un experto pueda contactarte directamente con tu análisis.</p>
+        
+        <input type="tel" id="user-phone-input" placeholder="Ej. 55 1234 5678" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
+        
+        <!-- Botón llamativo principal -->
+        <button onclick="submitWithPhone()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-200 flex items-center justify-center gap-2 mb-4 group">
+            Obtener Resultados
+            <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </button>
+        
+        <!-- La salida "Psicológica" oculta -->
+        <button onclick="submitWithoutPhone()" class="text-slate-400 hover:text-slate-600 text-xs font-medium underline underline-offset-4 transition">
+            Omitir y enviar resultados al correo
+        </button>
+    </div>
+</div>
+
+<!-- Assessment Wizard -->
+<section class="absolute inset-0 z-20 hidden flex flex-col bg-slate-50" id="wizard-section">
+<div class="w-full bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10 relative">
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-slate-600 transition" onclick="resetApp()">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div>
+<span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Pregunta <span id="current-step-num">1</span> de <span id="total-steps">5</span></span>
+<div class="h-1.5 w-32 bg-slate-100 rounded-full mt-1 overflow-hidden">
+<div class="h-full bg-blue-600 transition-all duration-500 w-0" id="progress-bar"></div>
+</div>
+</div>
+</div>
+<div class="hidden sm:block text-slate-500 text-sm italic" id="fun-fact-ticker" style="opacity: 1;">El costo promedio de inactividad es de $5,600 USD por minuto. (Gartner)</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-start">
+    <div class="w-full flex items-center justify-center min-h-min py-8">
+        <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-8 md:p-12 scale-in" id="question-card">
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- Loading Analysis Screen -->
+<section class="absolute inset-0 z-30 hidden bg-white flex flex-col items-center justify-center text-center p-6" id="loading-section">
+<div class="relative w-24 h-24 mb-8">
+<svg class="animate-spin w-full h-full text-blue-600" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+</svg>
+<span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-blue-600 text-3xl">smart_toy</span>
+</div>
+<h2 class="text-2xl font-bold text-slate-900 mb-2">Analizando sus respuestas...</h2>
+<p class="text-slate-500 max-w-md mx-auto mb-8" id="loading-text">Calculando puntaje de resiliencia...</p>
+<div class="bg-blue-50 border border-blue-100 p-6 rounded-xl max-w-lg w-full text-left">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-blue-600 mt-1">lightbulb</span>
+<div>
+<h4 class="font-bold text-blue-900 text-sm uppercase mb-1">¿Sabías que?</h4>
+<p class="text-blue-800 text-sm leading-relaxed" id="loading-fact">El 60% de las pequeñas empresas cierran dentro de los 6 meses posteriores a un ciberataque.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Results Dashboard -->
+<section class="absolute inset-0 z-40 hidden bg-slate-50 overflow-y-auto" id="results-section">
+<div class="bg-slate-900 text-white pt-12 pb-24 px-6 relative overflow-hidden print-break-inside">
+<img class="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay print-header-image" src="background1.png" onerror="this.src='https://images.unsplash.com/photo-1558494949-efc535b5fa12?q=80&w=2070'">
+<div class="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
+<div>
+<h2 class="text-3xl font-bold mb-2">Diagnóstico de Madurez BCP</h2>
+<p class="text-slate-400">Generado el <span id="current-date">4 de diciembre de 2025</span> para <span id="display-user-name" class="font-semibold text-blue-400">su empresa</span></p>
+</div>
+</div>
+</div>
+
+<div class="max-w-6xl mx-auto px-6 -mt-16 relative z-20 pb-20 print-container">
+    <div class="flex flex-col md:flex-row gap-6 items-start justify-center">
+
+        <!-- Columna Izquierda: Resultados principales -->
+        <div class="flex-1 w-full bg-white rounded-2xl shadow-lg border border-slate-100 p-8 text-center print-break-inside">
+            <div>
+                <h3 class="text-slate-500 font-medium text-sm uppercase tracking-wider mb-6">Puntaje Acumulado</h3>
+                
+                <div class="relative w-48 h-48 mx-auto mb-6">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle cx="96" cy="96" fill="transparent" r="88" stroke="#f1f5f9" stroke-width="12"></circle>
+                        <circle class="text-blue-600 transition-all duration-1000 ease-out" cx="96" cy="96" fill="transparent" id="score-circle" r="88" stroke="currentColor" stroke-dasharray="552" stroke-dashoffset="552" stroke-width="12"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-5xl font-bold text-slate-900" id="final-score">0</span>
+                        <span class="text-xs text-slate-400 mt-1">/ <span id="max-possible-score">50</span> Puntos</span>
+                    </div>
+                </div>
+
+                <div class="mb-4" id="score-label-container">
+                    <span class="px-4 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700" id="score-badge">Calculando...</span>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-8 max-w-lg mx-auto" id="score-description">
+                    Su empresa muestra vulnerabilidades significativas en la gestión de continuidad.
+                </p>
+                
+                <div class="bg-blue-50 rounded-xl p-6 border border-blue-100 mt-8" id="inline-email-form">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">¿Quieres ver los detalles de esta evaluación?</h4>
+                    <p class="text-slate-600 text-sm mb-4">Ingresa tu correo aquí para mandarte los detalles completos.</p>
+                    <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto relative">
+                        <input type="email" id="inline-user-email" class="flex-1 px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="nombre@empresa.com">
+                        
+                        <!-- BOTÓN MODIFICADO PARA LANZAR EL MODAL DE TELÉFONO -->
+                        <button onclick="handleInlineSubmit()" id="btn-inline-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg flex items-center justify-center gap-2">
+                            <span>Continuar</span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: BCMEX Service Pitch -->
+        <div class="w-full md:w-[320px] shrink-0 bg-gradient-to-br from-blue-900 to-slate-900 rounded-2xl p-6 text-white relative overflow-hidden shadow-xl print-break-inside no-print">
+            <!-- Efecto visual -->
+            <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20 -mr-12 -mt-12"></div>
+            
+            <div class="relative z-10 flex flex-col items-start text-left gap-2">
+                <h3 class="text-xl font-bold mb-1">Mejore su puntaje con BCMEX</h3>
+                <p class="text-blue-200 text-sm leading-relaxed" id="pitch-text">
+                    Nuestros expertos pueden implementar un BCP a medida que garantice la resiliencia operativa de su negocio.
+                </p>
+            </div>
+
+            <!-- SECCIÓN DE CONTACTO EN LA TARJETA LATERAL -->
+            <div class="relative z-10 mt-6 pt-6 border-t border-blue-800/60 flex flex-col gap-4">
+                <a href="mailto:comercial@bcmex.mx" class="flex items-center gap-3 text-blue-200 hover:text-white transition group">
+                    <div class="bg-blue-800/50 p-2.5 rounded-lg group-hover:bg-blue-600 transition shadow-sm">
+                        <span class="material-symbols-outlined text-base">mail</span>
+                    </div>
+                    <span class="text-sm font-medium tracking-wide">comercial@bcmex.mx</span>
+                </a>
+                <a href="https://bcmex.mx/" target="_blank" class="flex items-center gap-3 text-blue-200 hover:text-white transition group">
+                    <div class="bg-blue-800/50 p-2.5 rounded-lg group-hover:bg-blue-600 transition shadow-sm">
+                        <span class="material-symbols-outlined text-base">public</span>
+                    </div>
+                    <span class="text-sm font-medium tracking-wide">Visitar sitio web BCMEX</span>
+                </a>
+            </div>
+        </div>
+
+    </div> 
+
+    <div class="mt-12 text-center no-print">
+        <p class="text-sm text-slate-400">© 2026 BCMEX Solutions. Todos los derechos reservados.</p>
+    </div>
+</div>
+</section>
+
+</main>
+<script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getDatabase, ref, push, set, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
+        import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-IFIyAI-I-tIkDkljoqdBqh7c94ObHcc",
+            authDomain: "bcmexbcp.firebaseapp.com",
+            databaseURL: "https://bcmexbcp-default-rtdb.firebaseio.com",
+            projectId: "bcmexbcp",
+            storageBucket: "bcmexbcp.firebasestorage.app",
+            messagingSenderId: "279464565114",
+            appId: "1:279464565114:web:edf618d8dc06cd30c6dec3",
+            measurementId: "G-Z7V7Y6JMMW"
+        };
+
+        let db, auth, analytics;
+        let firebaseInitialized = false;
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app); 
+            auth = getAuth(app);
+            analytics = getAnalytics(app); 
+            firebaseInitialized = true;
+            
+            signInAnonymously(auth).catch((error) => {
+                console.warn("Auth Warning: Could not sign in anonymously.", error.code);
+            });
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+        }
+
+        const safeLogEvent = (eventName, params) => {
+            if (analytics) {
+                try {
+                    logEvent(analytics, eventName, params);
+                } catch (e) {
+                    console.warn("Analytics bloqueado o no disponible:", e);
+                }
+            }
+        };
+
+        const prospectingQuestions = [
+            { id: 'p1_market', text: "¿Cuál es la participación de mercado de su empresa en el país?", type: 'standard', options: [{ label: "Menos del 10%", val: 1 }, { label: "Entre 11% y 30%", val: 2 }, { label: "Entre 31% y 50%", val: 3 }, { label: "Mas del 51%", val: 4 }] },
+            { id: 'p2_employees', text: "¿Cuántas personas participan directamente en la operación diaria del negocio?", type: 'standard', options: [{ label: "Menos de 10", val: 1 }, { label: "10 - 50", val: 2 }, { label: "51 - 200", val: 3 }, { label: "201 - 500", val: 4 }, { label: "Mas de 500", val: 5 }] },
+            { id: 'p3_dependency', text: "¿Qué tan dependiente es su operación de sistemas digitales para generar ingresos?", type: 'standard', options: [{ label: "Baja, podríamos operar manualmente", val: 1 }, { label: "Media, alta productividad", val: 2 }, { label: "Alta, la operación se detiene", val: 3 }, { label: "Critica, el negocio no puede operar sin sistemas", val: 4 }] },
+            { id: 'p4_systems', text: "¿Cuántos sistemas o aplicaciones son críticos para la operación diaria?", type: 'standard', options: [{ label: "1-2", val: 1 }, { label: "3-5", val: 2 }, { label: "6-10", val: 3 }, { label: "Mas de 10", val: 4 }] },
+            { id: 'p5_impact', text: "Una interrupción tecnológica impactaría principalmente en:", type: 'standard', options: [{ label: "Operación interna", val: 1 }, { label: "Clientes finales", val: 2 }, { label: "Socios/Proveedores", val: 3 }, { label: "Clientes, ingreso y reputación", val: 4 }] },
+            { id: 'p6_team', text: "¿Existe un equipo o área responsable de continuidad, riesgos o tecnología?", type: 'standard', options: [{ label: "No", val: 1 }, { label: "Se asigna de forma informal", val: 2 }, { label: "Si, Pero con recursos limitados", val: 3 }, { label: "Si, con responsables definidos", val: 4 }] }
+        ];
+
+        const coreQuestions = [
+            { id: 'q1_financial', text: "Considerando la duración estimada de una interrupción en sus procesos clave, ¿qué nivel de pérdida financiera generaría para la organización?", type: 'standard', options: [{ label: "Afectación económica marginal o absorbible", val: 1 }, { label: "Costos moderados atribuibles a disminución de productividad", val: 2 }, { label: "Pérdidas financieras relevantes o riesgo de penalidades contractuales", val: 3 }, { label: "Impacto económico considerable con afectación a ingresos o al presupuesto operativo", val: 4 }, { label: "Pérdidas críticas que terminan en la desconfianza de proveedores y bajas en los clientes", val: 5 }] },
+            { id: 'q2_operational', text: "Si ocurre un incidente crítico en sus procesos clave, ¿Cuál sería el nivel de interrupción operativa a organización?", type: 'standard', options: [{ label: "Interrupción menor, con rápida recuperación operativa", val: 1 }, { label: "Afectación moderada al desempeño o a los tiempos de respuesta", val: 2 }, { label: "Paralización significativa de actividades esenciales", val: 3 }, { label: "Interrupción operativa severa que requiere monitoreo y gestión continua en tiempo real", val: 4 }] },
+            { id: 'q3_prioritization', text: "¿Cómo identifican y priorizan sus procesos críticos para continuidad?", type: 'standard', options: [{ label: "No están formalmente definidos", val: 1 }, { label: "Basado en experiencia del equipo", val: 2 }, { label: "Documentado en un BIA inicial o estructurado", val: 3 }, { label: "Basado en una evaluación de riesgos", val: 4 }, { label: "Mediante un análisis dinámico o automatizado de riesgos tomando en cuenta BIA", val: 5 }] },
+            { id: 'q4_rto', text: "Para sus procesos críticos, el RTO definido es:", type: 'standard', options: [{ label: "No existe RTO definido", val: 1 }, { label: "Mayor a 72 horas", val: 2 }, { label: "Entre 24 y 72 horas", val: 3 }, { label: "Menor a 24 horas", val: 4 }, { label: "RTO por proceso, monitoreado y alertado automáticamente", val: 5 }] },
+            { id: 'q5_rpo', text: "En caso de incidente, la pérdida aceptable de información es:", type: 'standard', options: [{ label: "No se ha definido", val: 1 }, { label: "Mayor a 24 horas", val: 2 }, { label: "Menor a 24 horas", val: 3 }, { label: "Menor a 4 horas", val: 4 }, { label: "RPO controlado, validado y monitoreado automáticamente", val: 5 }] },
+            { id: 'q6_recovery', text: "La recuperación de sistemas críticos es principalmente:", type: 'standard', options: [{ label: "Manual y reactiva", val: 1 }, { label: "Documentada pero manual", val: 2 }, { label: "Parcialmente automatizada", val: 3 }, { label: "Mayormente automatizada", val: 4 }, { label: "Orquestada y ejecutada automáticamente según evento", val: 5 }] },
+            { id: 'q7_responsibility', text: "Si ocurre una falla grave, la responsabilidad de recuperación recae en:", type: 'standard', options: [{ label: "Una sola persona", val: 1 }, { label: "Un equipo reducido", val: 2 }, { label: "Comité definido con roles claros", val: 3 }, { label: "Comité con documentación compartida", val: 4 }, { label: "Gobierno distribuido con visibilidad centralizada en tiempo real", val: 5 }] },
+            { id: 'q8_tests', text: "¿Con qué frecuencia se prueban los planes BCP/DRP?", type: 'standard', options: [{ label: "Nunca", val: 1 }, { label: "Solo después de un incidente", val: 2 }, { label: "Anualmente", val: 3 }, { label: "Varias veces al año", val: 4 }, { label: "Pruebas continuas y validación automática", val: 5 }] },
+            { id: 'q9_detection', text: "¿Cómo detectan riesgos de interrupción antes de que ocurran?", type: 'standard', options: [{ label: "No se detectan, se reacciona", val: 1 }, { label: "Alertas manuales o aisladas", val: 2 }, { label: "Dashboards operativos", val: 3 }, { label: "Monitoreo centralizado de continuidad", val: 4 }, { label: "Monitoreo proactivo automático por proceso crítico", val: 5 }] }
+        ];
+
+        const funFacts = [
+            "El 93% de las empresas que pierden su data center por 10 días quiebran en un año. (FEMA)",
+            "El costo promedio de inactividad es de $5,600 USD por minuto. (Gartner)",
+            "60% de las PyMEs cierran tras 6 meses de un ciberataque grave.",
+            "Solo el 54% de las empresas tienen un plan de recuperación ante desastres formal.",
+            "El error humano causa el 23% de las brechas de seguridad y pérdida de datos."
+        ];
+
+        let activeQuestions = [];
+        let currentStep = 0;
+        let answers = {};
+        let currentCalculatedScore = 0;
+        let currentMaxScore = 50; 
+        let currentRiskLevel = '';
+        let currentUserName = ''; 
+        let currentEmail = ''; // Variable global para guardar el correo temporalmente
+
+        window.heroSection = document.getElementById('hero-section');
+        window.wizardSection = document.getElementById('wizard-section');
+        window.loadingSection = document.getElementById('loading-section');
+        window.resultsSection = document.getElementById('results-section');
+        window.questionCard = document.getElementById('question-card');
+        window.progressBar = document.getElementById('progress-bar');
+        window.stepNum = document.getElementById('current-step-num');
+        window.totalSteps = document.getElementById('total-steps');
+        window.factTicker = document.getElementById('fun-fact-ticker');
+        window.nameModal = document.getElementById('name-modal');
+        window.phoneModal = document.getElementById('phone-modal');
+        
+        window.init = function() {
+            const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', dateOpts);
+            
+            let factIdx = 0;
+            factTicker.textContent = funFacts[0];
+            setInterval(() => {
+                factIdx = (factIdx + 1) % funFacts.length;
+                factTicker.style.opacity = 0;
+                setTimeout(() => {
+                    factTicker.textContent = funFacts[factIdx];
+                    factTicker.style.opacity = 1;
+                }, 500);
+            }, 6000);
+
+            safeLogEvent('screen_view', { screen_name: 'Inicio' });
+        }
+
+        window.toggleContactMenu = function() {
+            const menu = document.getElementById('contact-menu');
+            const chevron = document.getElementById('contact-chevron');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                menu.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        };
+
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('contact-menu');
+            const btn = document.getElementById('btn-contact');
+            if (menu && btn) {
+                if (!menu.contains(event.target) && !btn.contains(event.target)) {
+                    menu.classList.add('hidden');
+                    document.getElementById('contact-chevron').classList.remove('rotate-180');
+                }
+            }
+        });
+
+        window.openNameModal = function() {
+            nameModal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('user-name-input').focus(), 100);
+        }
+
+        window.closeNameModal = function() {
+            nameModal.classList.add('hidden');
+        }
+
+        window.handleNameKeypress = function(e) {
+            if (e.key === 'Enter') {
+                submitNameAndStart();
+            }
+        }
+
+        window.submitNameAndStart = function() {
+            const inputVal = document.getElementById('user-name-input').value.trim();
+            if (!inputVal) {
+                alert("Por favor, ingresa tu nombre para continuar.");
+                return;
+            }
+            if (inputVal.length > 40) {
+                alert("El nombre es demasiado largo. Por favor, usa un máximo de 40 caracteres.");
+                return;
+            }
+            currentUserName = inputVal;
+            closeNameModal();
+            startAssessment();
+        }
+
+        window.startAssessment = function() {
+            heroSection.classList.add('hidden');
+            wizardSection.classList.remove('hidden');
+            
+            activeQuestions = [...prospectingQuestions, ...coreQuestions];
+            currentStep = 0;
+            answers = {};
+            renderQuestion();
+
+            safeLogEvent('screen_view', { screen_name: 'Cuestionario' });
+        }
+
+        window.renderQuestion = function() {
+            const q = activeQuestions[currentStep];
+            stepNum.textContent = currentStep + 1;
+            totalSteps.textContent = activeQuestions.length;
+            
+            const progressPct = ((currentStep) / activeQuestions.length) * 100;
+            progressBar.style.width = `${progressPct}%`;
+
+            let html = `
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3>
+                <div class="mb-8"></div>
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-3">
+            `;
+
+            q.options.forEach((opt, idx) => {
+                const valArg = opt.val;
+                const labelArg = opt.label.replace(/'/g, "\\'");
+                html += `
+                    <div onclick="selectAnswer('${q.id}', ${valArg}, '${labelArg}')" 
+                         class="cursor-pointer group relative bg-white border-2 border-slate-100 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg transition-all duration-200 flex items-center h-full">
+                        <div class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex flex-shrink-0 items-center justify-center font-bold mr-4 group-hover:bg-blue-100 group-hover:text-blue-600 transition">${idx + 1}</div>
+                        <span class="text-slate-700 font-medium group-hover:text-blue-700 text-left">${opt.label}</span>
+                        <div class="absolute inset-0 border-2 border-transparent group-hover:border-blue-500 rounded-xl pointer-events-none"></div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            questionCard.classList.remove('scale-in');
+            void questionCard.offsetWidth;
+            questionCard.classList.add('scale-in');
+            questionCard.innerHTML = html;
+        }
+
+        window.selectAnswer = function(qid, val, label) {
+            answers[qid] = { value: val, label: label };
+            
+            safeLogEvent('question_answered', { question_id: qid, answer_value: val });
+
+            if (currentStep < activeQuestions.length - 1) {
+                currentStep++;
+                setTimeout(renderQuestion, 200);
+            } else {
+                finishAssessment();
+            }
+        }
+
+        window.finishAssessment = function() {
+            wizardSection.classList.add('hidden');
+            loadingSection.classList.remove('hidden');
+            let count = 0;
+            const loadingFacts = setInterval(() => {
+                document.getElementById('loading-fact').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+                count++;
+                if (count > 2) clearInterval(loadingFacts);
+            }, 1500);
+
+            setTimeout(() => {
+                try {
+                    calculateResults();
+                } catch(e) {
+                    console.error("Error al calcular:", e);
+                }
+                
+                loadingSection.classList.add('hidden');
+                resultsSection.classList.remove('hidden');
+
+                safeLogEvent('screen_view', { screen_name: 'Resultados' });
+
+            }, 3000);
+        }
+
+        window.calculateResults = function() {
+            let totalPoints = 0;
+            const fixedMaxScore = 50; 
+            
+            coreQuestions.forEach(q => {
+                const ans = answers[q.id];
+                if (ans && typeof ans.value === 'number') {
+                    totalPoints += ans.value;
+                }
+            });
+
+            currentCalculatedScore = totalPoints;
+            currentMaxScore = fixedMaxScore;
+            
+            document.getElementById('display-user-name').textContent = currentUserName;
+
+            updateDashboard(totalPoints, fixedMaxScore);
+
+            safeLogEvent('assessment_completed', { 
+                final_score: currentCalculatedScore, 
+                risk_level: currentRiskLevel 
+            });
+        }
+
+        window.updateDashboard = function(score, maxScore) {
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('max-possible-score').textContent = maxScore;
+            
+            const percentage = score / maxScore; 
+            const circle = document.getElementById('score-circle');
+            const circumference = 552; 
+            const offset = circumference - (percentage * circumference);
+            setTimeout(() => { circle.style.strokeDashoffset = offset; }, 500);
+
+            const badge = document.getElementById('score-badge');
+            const desc = document.getElementById('score-description');
+            const pitchText = document.getElementById('pitch-text');
+            const circleColor = document.getElementById('score-circle');
+
+            if (score < 20) {
+                currentRiskLevel = 'Crítico';
+                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700";
+                badge.textContent = "Nivel Crítico";
+                circleColor.classList.add('text-red-600');
+                circleColor.classList.remove('text-blue-600');
+                desc.textContent = "Su organización opera bajo un riesgo inminente. Se detectan brechas severas en los protocolos de recuperación.";
+                pitchText.textContent = "Su puntaje indica que un incidente menor podría convertirse en una crisis mayor.";
+            } else if (score <= 35) {
+                currentRiskLevel = 'En Desarrollo';
+                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700";
+                badge.textContent = "En Desarrollo";
+                circleColor.classList.add('text-orange-500');
+                circleColor.classList.remove('text-blue-600');
+                desc.textContent = "Tiene las herramientas, pero faltan integración y pruebas. Su plan puede existir, pero la confianza en su ejecución es moderada.";
+                pitchText.textContent = "Está a mitad de camino. BCMEX se especializa en llevar empresas del 'papel a la práctica'.";
+            } else {
+                currentRiskLevel = 'Madurez Alta';
+                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700";
+                badge.textContent = "Madurez Alta";
+                circleColor.classList.add('text-green-500');
+                circleColor.classList.remove('text-blue-600');
+                desc.textContent = "¡Excelente nivel de madurez! Su enfoque automatizado y proactivo lo pone por delante de la competencia.";
+                pitchText.textContent = "Incluso los mejores necesitan mantenerse afilados. BCMEX ofrece servicios de 'Threat Intelligence'.";
+            }
+        }
+
+        window.resetApp = function() {
+            heroSection.classList.remove('hidden');
+            wizardSection.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            loadingSection.classList.add('hidden');
+            const circle = document.getElementById('score-circle');
+            circle.style.strokeDashoffset = 552;
+            circle.classList.remove('text-red-600', 'text-orange-500', 'text-green-500');
+            circle.classList.add('text-blue-600');
+            
+            document.getElementById('user-name-input').value = '';
+            document.getElementById('user-phone-input').value = '';
+            currentUserName = '';
+            currentEmail = '';
+
+            safeLogEvent('screen_view', { screen_name: 'Inicio' });
+        }
+
+        // LÓGICA MODIFICADA PARA INTERCEPTAR EL CORREO
+        window.handleInlineSubmit = async function() {
+            if (!firebaseInitialized) {
+                alert("Error: Firebase no está configurado.");
+                return;
+            }
+
+            const lastSubmissionTime = localStorage.getItem('bcmex_last_submission');
+            if (lastSubmissionTime) {
+                const timePassed = Date.now() - parseInt(lastSubmissionTime, 10);
+                const cooldownMs = 2 * 60 * 1000; 
+
+                if (timePassed < cooldownMs) {
+                    const timeLeft = Math.ceil((cooldownMs - timePassed) / 60000);
+                    alert(`Ya hemos recibido tus datos recientemente. Por favor espera ${timeLeft} minuto(s) antes de enviar de nuevo.`);
+                    return; 
+                }
+            }
+
+            const emailInput = document.getElementById('inline-user-email');
+            const email = emailInput.value;
+            
+            if (!email || !email.includes('@')) {
+                alert('Por favor ingrese un correo válido.');
+                return;
+            }
+
+            // Guardamos el correo y abrimos el Modal de Teléfono
+            currentEmail = email;
+            phoneModal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('user-phone-input').focus(), 100);
+        }
+
+        // ACCIONES DEL MODAL DE TELÉFONO
+        window.submitWithPhone = function() {
+            const phone = document.getElementById('user-phone-input').value.trim();
+            
+            // NUEVO: Validación estricta en pantalla de 10 dígitos numéricos
+            if (phone !== "" && !/^\d{10}$/.test(phone)) {
+                alert("Por favor, ingrese un valor en formato válido (p.ej: 8112345678)");
+                return; // Detiene la ejecución para que no se envíe a Firebase
+            }
+            
+            finalSubmit(phone);
+        }
+
+        window.submitWithoutPhone = function() {
+            finalSubmit(""); // Teléfono vacío
+        }
+
+        // ENVÍO FINAL A FIREBASE
+        window.finalSubmit = async function(phoneNumber) {
+            phoneModal.classList.add('hidden'); // Cerramos el modal
+            
+            const btn = document.getElementById('btn-inline-submit');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="animate-spin material-symbols-outlined">progress_activity</span> Enviando...`;
+            btn.disabled = true;
+
+            try {
+                if (!auth.currentUser) {
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (e) {
+                        console.warn("Could not auth anonymously, attempting save anyway:", e);
+                    }
+                }
+
+                // NUEVO: Usamos el UID del usuario como ID del documento en lugar de usar push()
+                const newAnswerRef = ref(db, 'respuestas_bcmex/' + auth.currentUser.uid);
+                
+                // Guardamos en Firebase incluyendo el teléfono nuevo
+                await set(newAnswerRef, {
+                    name: currentUserName,         
+                    email: currentEmail,
+                    phone: phoneNumber, // <--- CAMPO NUEVO
+                    score: currentCalculatedScore,
+                    maxScore: currentMaxScore,
+                    level: currentRiskLevel,
+                    date: serverTimestamp(),       
+                    dateReadable: new Date().toLocaleString('es-MX'), 
+                    answers: answers
+                });
+
+                localStorage.setItem('bcmex_last_submission', Date.now().toString());
+
+                safeLogEvent('lead_generated', { 
+                    score: currentCalculatedScore,
+                    risk_level: currentRiskLevel 
+                });
+
+                alert("Se han capturado sus datos de manera exitosa. En breve le enviaremos los detalles completos a su correo.");
+                document.getElementById('inline-user-email').value = '';
+
+                resetApp();
+
+            } catch (error) {
+                console.error("Firebase save error:", error);
+                if (error.code === 'PERMISSION_DENIED') {
+                    alert("Error de permisos en Firebase. Asegúrate de añadir el campo 'phone' a las Reglas de Firebase o los datos no se guardarán.");
+                } else {
+                    alert("Hubo un error al guardar: " + error.message);
+                }
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body></html>
