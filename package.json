@@ -1,0 +1,12 @@
+{
+  "name": "bcmex-bcp-secure-api",
+  "version": "1.0.0",
+  "description": "API segura para el diagnóstico BCP de BCMEX",
+  "main": "api/guardar-lead.js",
+  "dependencies": {
+    "firebase-admin": "^11.11.1"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
