@@ -13,8 +13,6 @@ if (!admin.apps.length) {
   });
 }
 
-const db = admin.database();
-
 export default async function handler(req, res) {
   // Solo permitimos peticiones POST
   if (req.method !== 'POST') {
@@ -22,6 +20,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    // MOVIDO ADENTRO: Esto evita el error "Database initialized multiple times" en Vercel
+    const db = admin.database();
     const data = req.body;
 
     // Validación básica en servidor
