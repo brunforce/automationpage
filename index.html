@@ -3,7 +3,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>BCMEX - Diagnóstico y Reporte BCP</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
 <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -27,7 +27,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Print Specific Styles */
         @media print {
             @page { margin: 0.5cm; size: A4; }
             body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible !important; height: auto !important; }
@@ -44,30 +43,26 @@
             .print-break-inside { break-inside: avoid; }
             .print-container { max-width: 100% !important; padding: 0 20px !important; margin-top: 20px !important; }
             .print-header-image { height: 150px !important; opacity: 0.5 !important; }
-            
             h1, h2, h3 { color: #0f172a !important; }
             p, li { color: #334155 !important; }
         }
     </style>
-<link type="text/css" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@24,400,0,0,50&amp;icon_names=link" rel="stylesheet"></head>
+</head>
 <body class="text-slate-800 h-screen overflow-hidden flex flex-col">
+
 <!-- Navbar -->
 <nav class="w-full bg-white/95 backdrop-blur-md border-b border-slate-100 fixed top-0 z-50 h-20 flex items-center justify-between px-6 lg:px-12 shadow-sm no-print">
     <div class="flex items-center gap-3 cursor-pointer overflow-visible" onclick="resetApp()">
-        <!-- MODIFICADO: Usamos h-20 (alto total de la barra) y un zoom masivo personalizado de 250% en escritorio y 180% en móvil -->
         <img class="h-20 w-auto object-contain transform scale-[1.8] origin-left md:scale-[2.5] transition-all" src="logo1.png" alt="Logo BCMEX" onerror="this.src='https://placehold.co/120x40?text=Logo'">
     </div>
     
-    <!-- BOTÓN DE CONTÁCTANOS CON SLIDE -->
     <div class="relative">
         <button onclick="toggleContactMenu()" id="btn-contact" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white px-6 py-2.5 rounded-full text-sm font-bold transition shadow-md flex items-center gap-2">
             <span>Contáctanos</span>
             <span class="material-symbols-outlined text-[18px] transition-transform duration-300" id="contact-chevron">expand_more</span>
         </button>
 
-        <!-- Menú Desplegable (Slide) -->
         <div id="contact-menu" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-50 scale-in origin-top-right">
-            <!-- Opción Correo -->
             <a href="mailto:comercial@bcmex.mx" class="block p-3 hover:bg-slate-50 rounded-xl transition border-b border-slate-50 group">
                 <div class="flex items-start gap-4 text-slate-700">
                     <div class="bg-blue-50 p-2.5 rounded-lg text-[#0ea5e9] group-hover:bg-[#0ea5e9] group-hover:text-white transition-colors duration-300">
@@ -79,7 +74,6 @@
                     </div>
                 </div>
             </a>
-            <!-- Opción Web -->
             <a href="https://bcmex.mx/" target="_blank" class="block p-3 hover:bg-slate-50 rounded-xl transition group">
                 <div class="flex items-start gap-4 text-slate-700">
                     <div class="bg-blue-50 p-2.5 rounded-lg text-[#0ea5e9] group-hover:bg-[#0ea5e9] group-hover:text-white transition-colors duration-300">
@@ -145,28 +139,23 @@
     </div>
 </div>
 
-<!-- Modal 2: Solicitar Teléfono (Opcional) -->
+<!-- Modal 2: Solicitar Teléfono -->
 <div id="phone-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm px-4">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl scale-in text-center relative overflow-hidden">
-        <!-- Decoración top -->
         <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
-        
         <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
             <span class="material-symbols-outlined text-3xl">phone_iphone</span>
         </div>
-        
         <h3 class="text-2xl font-bold text-slate-900 mb-2">Un último paso...</h3>
         <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico para que un experto pueda contactarte directamente con tu análisis.</p>
         
         <input type="tel" id="user-phone-input" placeholder="Ej. 55 1234 5678" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
         
-        <!-- Botón llamativo principal -->
         <button onclick="submitWithPhone()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-200 flex items-center justify-center gap-2 mb-4 group">
             Obtener Resultados
             <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
         
-        <!-- La salida "Psicológica" oculta -->
         <button onclick="submitWithoutPhone()" class="text-slate-400 hover:text-slate-600 text-xs font-medium underline underline-offset-4 transition">
             Omitir y enviar resultados al correo
         </button>
@@ -181,7 +170,7 @@
 <span class="material-symbols-outlined">close</span>
 </button>
 <div>
-<span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Pregunta <span id="current-step-num">1</span> de <span id="total-steps">5</span></span>
+<span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Pregunta <span id="current-step-num">1</span> de <span id="total-steps">15</span></span>
 <div class="h-1.5 w-32 bg-slate-100 rounded-full mt-1 overflow-hidden">
 <div class="h-full bg-blue-600 transition-all duration-500 w-0" id="progress-bar"></div>
 </div>
@@ -226,7 +215,7 @@
 <div class="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
 <div>
 <h2 class="text-3xl font-bold mb-2">Diagnóstico de Madurez BCP</h2>
-<p class="text-slate-400">Generado el <span id="current-date">4 de diciembre de 2025</span> para <span id="display-user-name" class="font-semibold text-blue-400">su empresa</span></p>
+<p class="text-slate-400">Generado para <span id="display-user-name" class="font-semibold text-blue-400">su empresa</span></p>
 </div>
 </div>
 </div>
@@ -263,7 +252,6 @@
                     <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto relative">
                         <input type="email" id="inline-user-email" class="flex-1 px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="nombre@empresa.com">
                         
-                        <!-- BOTÓN MODIFICADO PARA LANZAR EL MODAL DE TELÉFONO -->
                         <button onclick="handleInlineSubmit()" id="btn-inline-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg flex items-center justify-center gap-2">
                             <span>Continuar</span>
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
@@ -275,7 +263,6 @@
 
         <!-- Columna Derecha: BCMEX Service Pitch -->
         <div class="w-full md:w-[320px] shrink-0 bg-gradient-to-br from-blue-900 to-slate-900 rounded-2xl p-6 text-white relative overflow-hidden shadow-xl print-break-inside no-print">
-            <!-- Efecto visual -->
             <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20 -mr-12 -mt-12"></div>
             
             <div class="relative z-10 flex flex-col items-start text-left gap-2">
@@ -285,7 +272,6 @@
                 </p>
             </div>
 
-            <!-- SECCIÓN DE CONTACTO EN LA TARJETA LATERAL -->
             <div class="relative z-10 mt-6 pt-6 border-t border-blue-800/60 flex flex-col gap-4">
                 <a href="mailto:comercial@bcmex.mx" class="flex items-center gap-3 text-blue-200 hover:text-white transition group">
                     <div class="bg-blue-800/50 p-2.5 rounded-lg group-hover:bg-blue-600 transition shadow-sm">
@@ -311,49 +297,10 @@
 </section>
 
 </main>
-<script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getDatabase, ref, push, set, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
-        import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getAnalytics, logEvent } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-IFIyAI-I-tIkDkljoqdBqh7c94ObHcc",
-            authDomain: "bcmexbcp.firebaseapp.com",
-            databaseURL: "https://bcmexbcp-default-rtdb.firebaseio.com",
-            projectId: "bcmexbcp",
-            storageBucket: "bcmexbcp.firebasestorage.app",
-            messagingSenderId: "279464565114",
-            appId: "1:279464565114:web:edf618d8dc06cd30c6dec3",
-            measurementId: "G-Z7V7Y6JMMW"
-        };
-
-        let db, auth, analytics;
-        let firebaseInitialized = false;
-
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getDatabase(app); 
-            auth = getAuth(app);
-            analytics = getAnalytics(app); 
-            firebaseInitialized = true;
-            
-            signInAnonymously(auth).catch((error) => {
-                console.warn("Auth Warning: Could not sign in anonymously.", error.code);
-            });
-        } catch (e) {
-            console.error("Firebase init failed:", e);
-        }
-
-        const safeLogEvent = (eventName, params) => {
-            if (analytics) {
-                try {
-                    logEvent(analytics, eventName, params);
-                } catch (e) {
-                    console.warn("Analytics bloqueado o no disponible:", e);
-                }
-            }
-        };
+<script>
+        // ELIMINADA TODA REFERENCIA A LIBRERÍAS DE FIREBASE
+        // SOLO JAVASCRIPT PURO PARA LA INTERFAZ Y EL FETCH AL BACKEND DE VERCEL
 
         const prospectingQuestions = [
             { id: 'p1_market', text: "¿Cuál es la participación de mercado de su empresa en el país?", type: 'standard', options: [{ label: "Menos del 10%", val: 1 }, { label: "Entre 11% y 30%", val: 2 }, { label: "Entre 31% y 50%", val: 3 }, { label: "Mas del 51%", val: 4 }] },
@@ -391,7 +338,7 @@
         let currentMaxScore = 50; 
         let currentRiskLevel = '';
         let currentUserName = ''; 
-        let currentEmail = ''; // Variable global para guardar el correo temporalmente
+        let currentEmail = '';
 
         window.heroSection = document.getElementById('hero-section');
         window.wizardSection = document.getElementById('wizard-section');
@@ -406,9 +353,6 @@
         window.phoneModal = document.getElementById('phone-modal');
         
         window.init = function() {
-            const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', dateOpts);
-            
             let factIdx = 0;
             factTicker.textContent = funFacts[0];
             setInterval(() => {
@@ -419,33 +363,14 @@
                     factTicker.style.opacity = 1;
                 }, 500);
             }, 6000);
-
-            safeLogEvent('screen_view', { screen_name: 'Inicio' });
         }
 
         window.toggleContactMenu = function() {
             const menu = document.getElementById('contact-menu');
             const chevron = document.getElementById('contact-chevron');
-            
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                chevron.classList.add('rotate-180');
-            } else {
-                menu.classList.add('hidden');
-                chevron.classList.remove('rotate-180');
-            }
+            menu.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
         };
-
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById('contact-menu');
-            const btn = document.getElementById('btn-contact');
-            if (menu && btn) {
-                if (!menu.contains(event.target) && !btn.contains(event.target)) {
-                    menu.classList.add('hidden');
-                    document.getElementById('contact-chevron').classList.remove('rotate-180');
-                }
-            }
-        });
 
         window.openNameModal = function() {
             nameModal.classList.remove('hidden');
@@ -457,19 +382,13 @@
         }
 
         window.handleNameKeypress = function(e) {
-            if (e.key === 'Enter') {
-                submitNameAndStart();
-            }
+            if (e.key === 'Enter') submitNameAndStart();
         }
 
         window.submitNameAndStart = function() {
             const inputVal = document.getElementById('user-name-input').value.trim();
             if (!inputVal) {
                 alert("Por favor, ingresa tu nombre para continuar.");
-                return;
-            }
-            if (inputVal.length > 40) {
-                alert("El nombre es demasiado largo. Por favor, usa un máximo de 40 caracteres.");
                 return;
             }
             currentUserName = inputVal;
@@ -480,13 +399,10 @@
         window.startAssessment = function() {
             heroSection.classList.add('hidden');
             wizardSection.classList.remove('hidden');
-            
             activeQuestions = [...prospectingQuestions, ...coreQuestions];
             currentStep = 0;
             answers = {};
             renderQuestion();
-
-            safeLogEvent('screen_view', { screen_name: 'Cuestionario' });
         }
 
         window.renderQuestion = function() {
@@ -500,7 +416,7 @@
             let html = `
                 <h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3>
                 <div class="mb-8"></div>
-                <div class="grid grid-cols-1 md:grid-cols-1 gap-3">
+                <div class="grid grid-cols-1 gap-3">
             `;
 
             q.options.forEach((opt, idx) => {
@@ -508,29 +424,23 @@
                 const labelArg = opt.label.replace(/'/g, "\\'");
                 html += `
                     <div onclick="selectAnswer('${q.id}', ${valArg}, '${labelArg}')" 
-                         class="cursor-pointer group relative bg-white border-2 border-slate-100 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg transition-all duration-200 flex items-center h-full">
-                        <div class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex flex-shrink-0 items-center justify-center font-bold mr-4 group-hover:bg-blue-100 group-hover:text-blue-600 transition">${idx + 1}</div>
+                         class="cursor-pointer group relative bg-white border-2 border-slate-100 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg transition flex items-center h-full">
+                        <div class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex flex-shrink-0 items-center justify-center font-bold mr-4 group-hover:bg-blue-100 group-hover:text-blue-600">${idx + 1}</div>
                         <span class="text-slate-700 font-medium group-hover:text-blue-700 text-left">${opt.label}</span>
-                        <div class="absolute inset-0 border-2 border-transparent group-hover:border-blue-500 rounded-xl pointer-events-none"></div>
                     </div>
                 `;
             });
             html += `</div>`;
 
-            questionCard.classList.remove('scale-in');
-            void questionCard.offsetWidth;
-            questionCard.classList.add('scale-in');
             questionCard.innerHTML = html;
         }
 
         window.selectAnswer = function(qid, val, label) {
             answers[qid] = { value: val, label: label };
             
-            safeLogEvent('question_answered', { question_id: qid, answer_value: val });
-
             if (currentStep < activeQuestions.length - 1) {
                 currentStep++;
-                setTimeout(renderQuestion, 200);
+                renderQuestion();
             } else {
                 finishAssessment();
             }
@@ -539,25 +449,11 @@
         window.finishAssessment = function() {
             wizardSection.classList.add('hidden');
             loadingSection.classList.remove('hidden');
-            let count = 0;
-            const loadingFacts = setInterval(() => {
-                document.getElementById('loading-fact').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
-                count++;
-                if (count > 2) clearInterval(loadingFacts);
-            }, 1500);
-
+            
             setTimeout(() => {
-                try {
-                    calculateResults();
-                } catch(e) {
-                    console.error("Error al calcular:", e);
-                }
-                
+                calculateResults();
                 loadingSection.classList.add('hidden');
                 resultsSection.classList.remove('hidden');
-
-                safeLogEvent('screen_view', { screen_name: 'Resultados' });
-
             }, 3000);
         }
 
@@ -578,11 +474,6 @@
             document.getElementById('display-user-name').textContent = currentUserName;
 
             updateDashboard(totalPoints, fixedMaxScore);
-
-            safeLogEvent('assessment_completed', { 
-                final_score: currentCalculatedScore, 
-                risk_level: currentRiskLevel 
-            });
         }
 
         window.updateDashboard = function(score, maxScore) {
@@ -628,42 +519,10 @@
         }
 
         window.resetApp = function() {
-            heroSection.classList.remove('hidden');
-            wizardSection.classList.add('hidden');
-            resultsSection.classList.add('hidden');
-            loadingSection.classList.add('hidden');
-            const circle = document.getElementById('score-circle');
-            circle.style.strokeDashoffset = 552;
-            circle.classList.remove('text-red-600', 'text-orange-500', 'text-green-500');
-            circle.classList.add('text-blue-600');
-            
-            document.getElementById('user-name-input').value = '';
-            document.getElementById('user-phone-input').value = '';
-            currentUserName = '';
-            currentEmail = '';
-
-            safeLogEvent('screen_view', { screen_name: 'Inicio' });
+            location.reload();
         }
 
-        // LÓGICA MODIFICADA PARA INTERCEPTAR EL CORREO
-        window.handleInlineSubmit = async function() {
-            if (!firebaseInitialized) {
-                alert("Error: Firebase no está configurado.");
-                return;
-            }
-
-            const lastSubmissionTime = localStorage.getItem('bcmex_last_submission');
-            if (lastSubmissionTime) {
-                const timePassed = Date.now() - parseInt(lastSubmissionTime, 10);
-                const cooldownMs = 2 * 60 * 1000; 
-
-                if (timePassed < cooldownMs) {
-                    const timeLeft = Math.ceil((cooldownMs - timePassed) / 60000);
-                    alert(`Ya hemos recibido tus datos recientemente. Por favor espera ${timeLeft} minuto(s) antes de enviar de nuevo.`);
-                    return; 
-                }
-            }
-
+        window.handleInlineSubmit = function() {
             const emailInput = document.getElementById('inline-user-email');
             const email = emailInput.value;
             
@@ -672,82 +531,62 @@
                 return;
             }
 
-            // Guardamos el correo y abrimos el Modal de Teléfono
             currentEmail = email;
             phoneModal.classList.remove('hidden');
             setTimeout(() => document.getElementById('user-phone-input').focus(), 100);
         }
 
-        // ACCIONES DEL MODAL DE TELÉFONO
         window.submitWithPhone = function() {
             const phone = document.getElementById('user-phone-input').value.trim();
-            
-            // NUEVO: Validación estricta en pantalla de 10 dígitos numéricos
             if (phone !== "" && !/^\d{10}$/.test(phone)) {
                 alert("Por favor, ingrese un valor en formato válido (p.ej: 8112345678)");
-                return; // Detiene la ejecución para que no se envíe a Firebase
+                return; 
             }
-            
             finalSubmit(phone);
         }
 
         window.submitWithoutPhone = function() {
-            finalSubmit(""); // Teléfono vacío
+            finalSubmit(""); 
         }
 
-        // ENVÍO FINAL A FIREBASE
+        // --- LA FUNCIÓN DE GUARDADO QUE CONECTA CON VERCEL ---
         window.finalSubmit = async function(phoneNumber) {
-            phoneModal.classList.add('hidden'); // Cerramos el modal
+            phoneModal.classList.add('hidden'); 
             
             const btn = document.getElementById('btn-inline-submit');
             const originalText = btn.innerHTML;
             btn.innerHTML = `<span class="animate-spin material-symbols-outlined">progress_activity</span> Enviando...`;
             btn.disabled = true;
 
+            const payload = {
+                name: currentUserName,
+                email: currentEmail,
+                phone: phoneNumber || "No proporcionado",
+                score: currentCalculatedScore,
+                level: currentRiskLevel,
+                answers: answers
+            };
+
             try {
-                if (!auth.currentUser) {
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (e) {
-                        console.warn("Could not auth anonymously, attempting save anyway:", e);
-                    }
+                // Hacemos la petición POST a tu propia API en Vercel
+                const response = await fetch('/api/guardar-lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("¡Se han capturado sus datos de manera exitosa! En breve le enviaremos los detalles completos a su correo.");
+                    document.getElementById('inline-user-email').value = '';
+                    resetApp();
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error desconocido en el servidor');
                 }
-
-                // NUEVO: Usamos el UID del usuario como ID del documento en lugar de usar push()
-                const newAnswerRef = ref(db, 'respuestas_bcmex/' + auth.currentUser.uid);
-                
-                // Guardamos en Firebase incluyendo el teléfono nuevo
-                await set(newAnswerRef, {
-                    name: currentUserName,         
-                    email: currentEmail,
-                    phone: phoneNumber, // <--- CAMPO NUEVO
-                    score: currentCalculatedScore,
-                    maxScore: currentMaxScore,
-                    level: currentRiskLevel,
-                    date: serverTimestamp(),       
-                    dateReadable: new Date().toLocaleString('es-MX'), 
-                    answers: answers
-                });
-
-                localStorage.setItem('bcmex_last_submission', Date.now().toString());
-
-                safeLogEvent('lead_generated', { 
-                    score: currentCalculatedScore,
-                    risk_level: currentRiskLevel 
-                });
-
-                alert("Se han capturado sus datos de manera exitosa. En breve le enviaremos los detalles completos a su correo.");
-                document.getElementById('inline-user-email').value = '';
-
-                resetApp();
 
             } catch (error) {
-                console.error("Firebase save error:", error);
-                if (error.code === 'PERMISSION_DENIED') {
-                    alert("Error de permisos en Firebase. Asegúrate de añadir el campo 'phone' a las Reglas de Firebase o los datos no se guardarán.");
-                } else {
-                    alert("Hubo un error al guardar: " + error.message);
-                }
+                console.error("Error al hacer fetch al backend:", error);
+                alert("Hubo un problema al enviar los datos. Reintenta más tarde.");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
