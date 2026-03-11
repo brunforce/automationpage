@@ -1,123 +1,125 @@
 const admin = require('firebase-admin');
 
-// Memoria temporal para guardar las IPs y evitar el Spam (Rate Limiting)
 const ipCache = new Map();
-const RATE_LIMIT_WINDOW_MS = 120 * 1000; // 2 minutos
-const MAX_REQUESTS = 1; // Máximo 1 petición cada 2 minutos
+const RATE_LIMIT_WINDOW_MS = 120 * 1000; 
+const MAX_REQUESTS = 1; 
 
-// --- LISTA BLANCA DE CORS ---
-// IMPORTANTE: Debes reemplazar esta URL con el enlace real de tu aplicación en Vercel
 const ALLOWED_ORIGINS = [
   'https://bcpscore.vercel.app' 
 ];
 
 export default async function handler(req, res) {
+  // --- INICIO SEGURIDAD: LÍMITE DE TAMAÑO (PAYLOAD BLOAT) ---
+  // Vercel permite limitar el tamaño del body. Si el payload en formato string es mayor a 50KB, lo bloqueamos.
+  const payloadString = JSON.stringify(req.body || {});
+  if (Buffer.byteLength(payloadString, 'utf8') > 50000) {
+    console.warn('[SEGURIDAD] Intento de inyección de payload gigante bloqueado.');
+    return res.status(413).json({ error: 'Payload Too Large: El paquete de datos excede el límite permitido.' });
+  }
+
   // --- INICIO DE SEGURIDAD CORS ---
   const origin = req.headers.origin;
 
-  // Si la petición viene de un navegador (tiene origen) y no está en tu lista blanca: ¡Bloquear!
   if (origin && !ALLOWED_ORIGINS.includes(origin)) {
-    console.warn(`[CORS] Ataque o intento de acceso bloqueado desde dominio no autorizado: ${origin}`);
-    return res.status(403).json({ error: 'Acceso denegado por políticas de CORS' });
+    console.warn(`[CORS] Intento bloqueado desde: ${origin}`);
+    return res.status(403).json({ error: 'Acceso denegado' });
   }
 
-  // Si está autorizado, le enviamos los permisos correctos
   res.setHeader('Access-Control-Allow-Origin', origin || ALLOWED_ORIGINS[0]);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // El navegador siempre hace una petición "preflight" (OPTIONS) para comprobar seguridad antes del POST
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  // --- FIN DE SEGURIDAD CORS ---
-
-  // 1. Solo permitimos peticiones POST
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });
   }
 
   // --- INICIO DE SISTEMA ANTI-SPAM ---
-  // Obtenemos la IP del usuario (Vercel la inyecta en este header)
-  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'ip-desconocida';
+  const rawForwarded = req.headers['x-forwarded-for'] || '';
+  const clientIp = req.headers['x-real-ip'] || rawForwarded.split(',')[0].trim() || req.socket.remoteAddress || 'ip-desconocida';
   const currentTime = Date.now();
 
   if (ipCache.has(clientIp)) {
     const rateData = ipCache.get(clientIp);
-    
-    // Si estamos dentro de la ventana de 1 minuto
     if (currentTime - rateData.startTime < RATE_LIMIT_WINDOW_MS) {
       if (rateData.count >= MAX_REQUESTS) {
-        console.warn(`[ANTI-SPAM] IP Bloqueada temporalmente: ${clientIp}`);
-        return res.status(429).json({ error: 'Demasiadas solicitudes. Por favor, espera un minuto.' });
+        return res.status(429).json({ error: 'Demasiadas solicitudes. Por favor, espera unos minutos.' });
       }
       rateData.count++;
     } else {
-      // Pasó el minuto, reseteamos su contador
       ipCache.set(clientIp, { count: 1, startTime: currentTime });
     }
   } else {
-    // Es la primera vez que esta IP hace una petición
     ipCache.set(clientIp, { count: 1, startTime: currentTime });
   }
 
-  // Limpieza de memoria (para evitar que el Map crezca al infinito si hay un ataque)
   if (ipCache.size > 1000) {
     ipCache.clear();
   }
-  // --- FIN DE SISTEMA ANTI-SPAM ---
 
-  // 2. Validaciones estrictas de Variables de Entorno
+  // --- VALIDACIONES ESTRICTAS DE ENTORNO ---
   const dbUrl = process.env.FIREBASE_DATABASE_URL;
   if (!dbUrl || !dbUrl.startsWith('http')) {
-    console.error('CRÍTICO: FIREBASE_DATABASE_URL es incorrecta o no es un enlace válido:', dbUrl);
-    return res.status(500).json({ error: 'Error de configuración en servidor: Database URL inválida' });
+    return res.status(500).json({ error: 'Database URL inválida' });
   }
 
   if (!process.env.FIREBASE_PRIVATE_KEY) {
-    console.error('CRÍTICO: FIREBASE_PRIVATE_KEY está vacía o no existe.');
-    return res.status(500).json({ error: 'Error de configuración en servidor: Falta Private Key' });
+    return res.status(500).json({ error: 'Falta Private Key' });
   }
 
   try {
-    // 3. Inicialización segura de Firebase Admin
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert({
           projectId: process.env.FIREBASE_PROJECT_ID,
           clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          // Manejo seguro de saltos de línea en la llave privada
           privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
         }),
         databaseURL: dbUrl
       });
     }
 
-    // 4. Conexión a la base de datos
     const db = admin.database();
     const data = req.body;
 
-    // 5. Validación de los datos (Previene que manden basura vacía)
-    if (!data.email || typeof data.email !== 'string' || !data.email.includes('@')) {
-      return res.status(400).json({ error: 'Correo electrónico inválido' });
+    // --- INICIO SEGURIDAD: SANITIZACIÓN DE DATOS (DATA VALIDATION) ---
+    // Si un bot envía datos por Postman ignorando el HTML, validamos que no mande basura.
+    if (!data.email || typeof data.email !== 'string' || !data.email.includes('@') || data.email.length > 100) {
+      return res.status(400).json({ error: 'Correo electrónico inválido o demasiado largo' });
     }
-    if (!data.name || data.name.trim() === '') {
-      return res.status(400).json({ error: 'El nombre es obligatorio' });
+    if (!data.name || typeof data.name !== 'string' || data.name.trim() === '' || data.name.length > 80) {
+      return res.status(400).json({ error: 'Nombre inválido o demasiado largo' });
+    }
+    
+    // Validamos que el score sea numérico y tenga sentido (ej. de 0 a 100) para evitar inyecciones.
+    const cleanScore = typeof data.score === 'number' ? data.score : parseInt(data.score, 10);
+    if (isNaN(cleanScore) || cleanScore < 0 || cleanScore > 500) {
+      return res.status(400).json({ error: 'El puntaje (score) proporcionado no es válido' });
     }
 
-    // 6. Guardado seguro en Realtime Database
-    const newLeadRef = db.ref('respuestas_bcmex').push();
-    
-    await newLeadRef.set({
-      ...data,
+    // Limpiamos los strings básicos para evitar scripts largos
+    const cleanData = {
+      name: data.name.trim().substring(0, 80),
+      email: data.email.trim().toLowerCase().substring(0, 100),
+      phone: typeof data.phone === 'string' ? data.phone.trim().substring(0, 20) : "No proporcionado",
+      level: typeof data.level === 'string' ? data.level.substring(0, 50) : "Desconocido",
+      score: cleanScore,
+      answers: typeof data.answers === 'object' ? data.answers : {}, // Aceptamos objeto de respuestas
       timestamp: admin.database.ServerValue.TIMESTAMP,
       source: 'Vercel-API-Secure'
-    });
+    };
+
+    // 6. Guardado seguro
+    const newLeadRef = db.ref('respuestas_bcmex').push();
+    await newLeadRef.set(cleanData);
 
     return res.status(200).json({ success: true, message: 'Lead guardado con éxito' });
     
   } catch (error) {
     console.error('Error interno de Firebase Admin:', error);
-    return res.status(500).json({ error: 'Error interno al procesar y guardar la solicitud' });
+    return res.status(500).json({ error: 'Error interno al procesar la solicitud' });
   }
 }
