@@ -571,7 +571,8 @@
                 // Hacemos la petición POST a tu propia API en Vercel
                 const response = await fetch('/api/guardar-lead', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json',
+                                'Version': 'gX9#mK2$pL7qRt4vNw'},
                     body: JSON.stringify(payload)
                 });
 
