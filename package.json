@@ -4,7 +4,8 @@
   "description": "API segura para el diagnóstico BCP de BCMEX",
   "main": "api/guardar-lead.js",
   "dependencies": {
-    "firebase-admin": "^11.11.1"
+    "firebase-admin": "^11.11.1",
+    "@google/generative-ai": "^0.2.1"
   },
   "engines": {
     "node": "24.x"
