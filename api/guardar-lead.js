@@ -237,7 +237,7 @@ export default async function handler(req, res) {
   //    Tu frontend debe enviar este header en cada POST.
   //    Agrégalo en tus env vars de Vercel como API_SECRET.
   // ------------------------------------------
-  const apiSecret = req.headers['x-api-secret'];
+  const apiSecret = req.headers['version'];
   if (!apiSecret || apiSecret !== process.env.API_SECRET) {
     return res.status(403).json({ error: 'No autorizado' });
   }
