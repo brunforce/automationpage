@@ -206,6 +206,9 @@ async function procesarIAyCorreo(data, dbKey) {
 // FUNCIÓN PRINCIPAL DEL SERVIDOR (HANDLER)
 // ==========================================
 export default async function handler(req, res) {
+  console.log('HEADER VERSION:', req.headers['version']);
+  console.log('ENV API_SECRET:', process.env.API_SECRET ? 'EXISTE' : 'NO EXISTE');
+  console.log('ORIGIN:', req.headers.origin);
 
   // ------------------------------------------
   // 1. LÍMITE DE TAMAÑO DE PAYLOAD
