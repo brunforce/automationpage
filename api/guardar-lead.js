@@ -329,6 +329,11 @@ export default async function handler(req, res) {
 
     const db = admin.database();
     const data = req.body;
+    console.log('BODY RECIBIDO:', JSON.stringify(data));
+    console.log('LEVEL:', data.level);
+    console.log('SCORE:', data.score);
+    console.log('PHONE:', data.phone);
+    console.log('EMAIL:', data.email);
 
     // ------------------------------------------
     // 7. VALIDACIONES DE CAMPOS
@@ -357,7 +362,11 @@ export default async function handler(req, res) {
 
     // Phone — vacío o exactamente 10 dígitos
     const rawPhone = typeof data.phone === 'string' ? data.phone.trim() : '';
-    if (rawPhone !== '' && !/^[0-9]{10}$/.test(rawPhone)) {
+    const phoneToSave = (rawPhone === '' || rawPhone === 'No proporcionado') 
+      ? 'No proporcionado' 
+      : rawPhone;
+    
+    if (phoneToSave !== 'No proporcionado' && !/^[0-9]{10}$/.test(phoneToSave)) {
       return res.status(400).json({ error: 'Teléfono inválido' });
     }
 
@@ -375,7 +384,7 @@ export default async function handler(req, res) {
     const cleanData = {
       name:      data.name.trim().substring(0, 80),
       email:     data.email.trim().toLowerCase().substring(0, 100),
-      phone:     rawPhone || 'No proporcionado',
+      phone:     phoneToSave,
       level:     data.level,
       score:     cleanScore,
       answers:   cleanAnswers,
