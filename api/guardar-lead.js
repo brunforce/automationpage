@@ -11,7 +11,7 @@ const ALLOWED_ORIGINS = [
   'https://bcpscore.vercel.app'
 ];
 
-const VALID_LEVELS = ['Bajo', 'Medio', 'Alto', 'Crítico']; // Ajusta a tus valores reales
+const VALID_LEVELS = ['Crítico', 'En Desarrollo', 'Madurez Alta']; // Ajusta a tus valores reales
 const MAX_ANSWERS = 30;       // Máximo de preguntas esperadas en el formulario
 const MAX_LABEL_LENGTH = 300; // Máximo de caracteres por respuesta
 const SCORE_MIN = 0;
