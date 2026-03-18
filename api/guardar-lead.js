@@ -8,7 +8,7 @@ const path = require('path');
 // ==========================================
 
 const ALLOWED_ORIGINS = [
-  'https://bcpscore2.vercel.app'
+  'https://bcpscore.vercel.app'
 ];
 
 const VALID_LEVELS = ['Bajo', 'Medio', 'Alto', 'Crítico']; // Ajusta a tus valores reales
