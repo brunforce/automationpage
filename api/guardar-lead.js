@@ -167,8 +167,8 @@ async function procesarIAyCorreo(data, dbKey) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background-color:#e8edf4;font-family:'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#e8edf4;padding:40px 0;">
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 0;">
 <tr><td align="center">
 <table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
 
@@ -189,10 +189,10 @@ async function procesarIAyCorreo(data, dbKey) {
 
   <!-- CUERPO BLANCO -->
   <tr>
-    <td style="background:#ffffff;padding:36px 52px 24px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
-      <p style="margin:0 0 6px;font-size:13px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;">Preparado para</p>
-      <p style="margin:0 0 20px;font-size:22px;font-weight:600;color:#0f172a;">${safeName}</p>
-      <p style="margin:0;font-size:14px;color:#475569;line-height:1.85;">
+    <td style="background:#ffffff;padding:36px 52px 24px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
+      <p style="margin:0 0 6px;font-size:13px;color:#4a7cb5;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Preparado para</p>
+      <p style="margin:0 0 20px;font-size:22px;font-weight:700;color:#0a1628;">${safeName}</p>
+      <p style="margin:0;font-size:14px;color:#334155;line-height:1.85;">
         Hemos concluido el an&#225;lisis de resiliencia de su organizaci&#243;n.
         A continuaci&#243;n encontrar&#225; los resultados detallados y las recomendaciones
         de nuestro equipo especializado en continuidad de negocio.
@@ -204,7 +204,7 @@ async function procesarIAyCorreo(data, dbKey) {
   <tr>
     <td style="background:#ffffff;padding:8px 52px 20px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;text-align:center;">
       <div style="height:1px;width:70px;background:linear-gradient(90deg,transparent,#bdd7f5);display:inline-block;vertical-align:middle;"></div>
-      <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#94a3b8;padding:0 12px;vertical-align:middle;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
+      <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#4a7cb5;font-weight:600;padding:0 12px;vertical-align:middle;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
       <div style="height:1px;width:70px;background:linear-gradient(90deg,#bdd7f5,transparent);display:inline-block;vertical-align:middle;"></div>
     </td>
   </tr>
@@ -212,9 +212,9 @@ async function procesarIAyCorreo(data, dbKey) {
   <!-- CONTENIDO IA -->
   <tr>
     <td style="background:#ffffff;padding:0 52px 36px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
-      <div style="background:#f0f7ff;border:1px solid #dce8f7;border-left:4px solid #1a3a6e;border-radius:0 10px 10px 0;padding:28px 30px;">
+      <div style="background:#f5f9ff;border:1px solid #c5d9f0;border-left:5px solid #1a3a6e;border-radius:0 10px 10px 0;padding:28px 30px;">
         <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1a3a6e;font-weight:600;">&#128203; An&#225;lisis de Resultados</p>
-        <p style="margin:0;font-size:14px;color:#1e293b;line-height:2;white-space:pre-line;">${correoCliente.replace(/\n/g, '<br>')}</p>
+        <p style="margin:0;font-size:14px;color:#0a1628;line-height:2;white-space:pre-line;">${correoCliente.replace(/\n/g, '<br>')}</p>
       </div>
     </td>
   </tr>
@@ -232,8 +232,8 @@ async function procesarIAyCorreo(data, dbKey) {
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="background:linear-gradient(135deg,#eaf2ff,#dbeafe);border:1px solid #bdd7f5;border-radius:14px;padding:28px 32px;text-align:center;">
-            <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:#0f172a;">&#191;Listo para el siguiente paso?</p>
-            <p style="margin:0 0 22px;font-size:13px;color:#475569;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
+            <p style="margin:0 0 6px;font-size:17px;font-weight:700;color:#0a1628;">&#191;Listo para el siguiente paso?</p>
+            <p style="margin:0 0 22px;font-size:13px;color:#334155;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
             <a href="https://bcmex.mx" style="display:inline-block;background:linear-gradient(135deg,#1a3a6e,#1e4d9b);color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 40px;border-radius:30px;">
               Visitar BCMEX.mx &nbsp;&#8594;
             </a>
