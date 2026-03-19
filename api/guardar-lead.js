@@ -161,30 +161,161 @@ async function procesarIAyCorreo(data, dbKey) {
     const safePhone = escapeHtml(data.phone);
 
     // Correo Cliente
+    const htmlCliente = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#0d1117;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0d1117;padding:48px 0;">
+<tr><td align="center">
+<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
+  <tr>
+    <td style="background:linear-gradient(90deg,#1d4ed8,#0ea5e9,#6366f1);height:4px;border-radius:4px 4px 0 0;font-size:0;line-height:0;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="background:linear-gradient(160deg,#0f172a 0%,#1e2d4a 60%,#162040 100%);padding:52px 52px 40px;text-align:center;">
+      <img src="https://bcpscore.vercel.app/logo1.png" alt="BCMEX" style="height:56px;width:auto;display:block;margin:0 auto 28px;">
+      <div style="display:inline-block;background:rgba(30,64,175,0.35);border:1px solid rgba(96,165,250,0.25);border-radius:20px;padding:5px 18px;margin-bottom:20px;">
+        <span style="font-size:10px;color:#93c5fd;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Confidencial</span>
+      </div>
+      <h1 style="margin:0 0 10px;font-size:28px;font-weight:300;color:#f0f6ff;letter-spacing:0.5px;line-height:1.3;">
+        Diagn&#243;stico de<br><strong style="font-weight:700;">Resiliencia Empresarial</strong>
+      </h1>
+      <p style="margin:0;font-size:12px;color:rgba(148,163,184,0.7);letter-spacing:2.5px;text-transform:uppercase;">Plan de Continuidad de Negocio</p>
+      <div style="margin:28px auto 0;width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(96,165,250,0.6),transparent);"></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111827;padding:36px 52px 24px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+      <p style="margin:0 0 6px;font-size:13px;color:#64748b;letter-spacing:2px;text-transform:uppercase;">Preparado para</p>
+      <p style="margin:0 0 20px;font-size:22px;font-weight:600;color:#e2e8f0;">${safeName}</p>
+      <p style="margin:0;font-size:14px;color:#94a3b8;line-height:1.85;">
+        Hemos concluido el an&#225;lisis de resiliencia de su organizaci&#243;n.
+        A continuaci&#243;n encontrar&#225; los resultados detallados y las recomendaciones
+        de nuestro equipo especializado en continuidad de negocio.
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111827;padding:8px 52px 20px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;text-align:center;">
+      <div style="height:1px;width:70px;background:linear-gradient(90deg,transparent,#334155);display:inline-block;vertical-align:middle;"></div>
+      <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#475569;padding:0 12px;vertical-align:middle;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
+      <div style="height:1px;width:70px;background:linear-gradient(90deg,#334155,transparent);display:inline-block;vertical-align:middle;"></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111827;padding:0 52px 36px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+      <div style="background:#0f172a;border:1px solid #1e3a5f;border-left:4px solid #3b82f6;border-radius:0 12px 12px 0;padding:28px 30px;">
+        <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3b82f6;font-weight:600;">&#128203; An&#225;lisis de Resultados</p>
+        <p style="margin:0;font-size:14px;color:#cbd5e1;line-height:2;white-space:pre-line;">${correoCliente.replace(/\n/g, '<br>')}</p>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111827;padding:0 52px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+      <div style="height:1px;background:linear-gradient(90deg,transparent,#1e3a5f,transparent);"></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111827;padding:32px 52px 44px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background:linear-gradient(135deg,#0f2044,#162952);border:1px solid #1e3f7a;border-radius:14px;padding:28px 32px;text-align:center;">
+            <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:#e2e8f0;">&#191;Listo para el siguiente paso?</p>
+            <p style="margin:0 0 22px;font-size:13px;color:#64748b;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
+            <a href="https://bcmex.mx" style="display:inline-block;background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 40px;border-radius:30px;">
+              Visitar BCMEX.mx &nbsp;&#8594;
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#0a0f1a;border-top:1px solid #1e293b;border-left:1px solid #1e293b;border-right:1px solid #1e293b;padding:30px 52px;text-align:center;">
+      <p style="margin:0 0 4px;font-size:15px;color:#e2e8f0;letter-spacing:4px;font-weight:300;">BCMEX</p>
+      <p style="margin:0 0 16px;font-size:10px;color:#334155;letter-spacing:1.5px;text-transform:uppercase;">Resiliencia Empresarial &nbsp;&#183;&nbsp; Continuidad de Negocio</p>
+      <div style="height:1px;background:#1e293b;margin:0 auto 16px;width:40px;"></div>
+      <p style="margin:0;font-size:11px;color:#334155;line-height:1.8;">
+        Este correo es confidencial y est&#225; dirigido exclusivamente a su destinatario.<br>
+        <a href="https://bcmex.mx" style="color:#475569;text-decoration:none;">www.bcmex.mx</a>
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:linear-gradient(90deg,#6366f1,#0ea5e9,#1d4ed8);height:3px;border-radius:0 0 4px 4px;font-size:0;line-height:0;">&nbsp;</td>
+  </tr>
+  <tr><td style="height:40px;"></td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
     const payloadCliente = {
       From: process.env.POSTMARK_FROM_EMAIL,
       To: data.email,
       Subject: "Diagnóstico de Resiliencia BCP - Resultados BCMEX",
-      HtmlBody: `<html><body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-          <p>${correoCliente.replace(/\n/g, '<br>')}</p>
-          <br><p>Saludos cordiales,<br><b>El equipo de BCMEX</b><br><a href="https://bcmex.mx">www.bcmex.mx</a></p>
-      </body></html>`
+      HtmlBody: htmlCliente
     };
 
     // Correo Interno — todos los campos del usuario van escapados
-    const payloadInterno = {
+    const htmlInterno = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0d1117;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0d1117;padding:30px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr>
+    <td style="background:linear-gradient(90deg,#f59e0b,#ef4444);height:3px;border-radius:3px 3px 0 0;font-size:0;line-height:0;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="background:linear-gradient(135deg,#1a1a2e,#16213e);padding:28px 36px;text-align:center;">
+      <p style="margin:0 0 6px;font-size:10px;letter-spacing:4px;color:rgba(251,191,36,0.8);text-transform:uppercase;">&#128293; Nuevo Lead Detectado</p>
+      <h2 style="margin:0 0 6px;font-size:20px;font-weight:600;color:#f0f6ff;">${safeName}</h2>
+      <p style="margin:0;font-size:12px;color:rgba(147,197,253,0.6);">${safeEmail}</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111827;padding:24px 36px 8px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:8px 12px;background:#0f172a;border-radius:8px;border:1px solid #1e293b;">
+            <span style="font-size:11px;color:#64748b;">Tel&#233;fono</span><br>
+            <span style="font-size:13px;color:#e2e8f0;font-weight:500;">${safePhone}</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#111827;padding:16px 36px 32px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+      <p style="margin:0 0 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#f59e0b;font-weight:600;">&#128202; An&#225;lisis Interno · Equipo BCMEX</p>
+      <div style="background:#0f172a;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:20px 22px;">
+        <p style="margin:0;font-size:13px;color:#cbd5e1;line-height:1.85;white-space:pre-line;">${analisisInterno.replace(/\n/g, '<br>')}</p>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#0a0f1a;border-top:1px solid #1e293b;border-left:1px solid #1e293b;border-right:1px solid #1e293b;border-radius:0 0 4px 4px;padding:16px 36px;text-align:center;">
+      <p style="margin:0;font-size:11px;color:#334155;">Notificaci&#243;n interna BCMEX &nbsp;&#183;&nbsp; No responder a este correo</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:linear-gradient(90deg,#ef4444,#f59e0b);height:3px;border-radius:0 0 3px 3px;font-size:0;line-height:0;">&nbsp;</td>
+  </tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
       From: process.env.POSTMARK_FROM_EMAIL,
       To: process.env.POSTMARK_INTERNAL_EMAIL,
       Subject: `🔥 NUEVO LEAD BCP: ${safeName}`,
-      HtmlBody: `<html><body style="font-family: Arial, sans-serif; color: #1a202c;">
-          <h2 style="color: #2b6cb0;">Nuevo prospecto evaluado: ${safeName}</h2>
-          <p><b>Email de contacto:</b> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
-          <p><b>Teléfono:</b> ${safePhone}</p>
-          <hr style="border: 1px solid #e2e8f0; margin: 20px 0;">
-          <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px;">
-              ${analisisInterno.replace(/\n/g, '<br>')}
-          </div>
-      </body></html>`
+      HtmlBody: htmlInterno
     };
 
     console.log(`[Postmark] Enviando correos...`);
@@ -206,9 +337,7 @@ async function procesarIAyCorreo(data, dbKey) {
 // FUNCIÓN PRINCIPAL DEL SERVIDOR (HANDLER)
 // ==========================================
 export default async function handler(req, res) {
-  console.log('HEADER VERSION:', req.headers['version']);
-  console.log('ENV API_SECRET:', process.env.API_SECRET ? 'EXISTE' : 'NO EXISTE');
-  console.log('ORIGIN:', req.headers.origin);
+
 
   // ------------------------------------------
   // 1. LÍMITE DE TAMAÑO DE PAYLOAD
@@ -329,11 +458,7 @@ export default async function handler(req, res) {
 
     const db = admin.database();
     const data = req.body;
-    console.log('BODY RECIBIDO:', JSON.stringify(data));
-    console.log('LEVEL:', data.level);
-    console.log('SCORE:', data.score);
-    console.log('PHONE:', data.phone);
-    console.log('EMAIL:', data.email);
+
 
     // ------------------------------------------
     // 7. VALIDACIONES DE CAMPOS
