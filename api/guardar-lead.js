@@ -312,6 +312,8 @@ async function procesarIAyCorreo(data, dbKey) {
 </table>
 </body>
 </html>`;
+
+    const payloadInterno = {
       From: process.env.POSTMARK_FROM_EMAIL,
       To: process.env.POSTMARK_INTERNAL_EMAIL,
       Subject: `🔥 NUEVO LEAD BCP: ${safeName}`,
