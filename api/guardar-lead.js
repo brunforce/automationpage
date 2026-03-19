@@ -181,7 +181,7 @@ async function procesarIAyCorreo(data, dbKey) {
         <v:textbox inset="0,0,0,0">
       <![endif]-->
       <div style="padding:52px 52px 40px;text-align:center;background:linear-gradient(160deg,#0a1628 0%,#1a3a6e 55%,#1e4d9b 100%);">
-        <img src="https://bcpscore.vercel.app/logo1.png" alt="BCMEX" style="height:56px;width:auto;display:block;margin:0 auto 28px;">
+        <img src="https://bcpscore.vercel.app/api/logo1.png" alt="BCMEX" style="height:56px;width:auto;display:block;margin:0 auto 28px;">
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
           <tr><td align="center">
             <table cellpadding="0" cellspacing="0">
