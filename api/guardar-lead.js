@@ -167,65 +167,74 @@ async function procesarIAyCorreo(data, dbKey) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background-color:#0d1117;font-family:'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0d1117;padding:48px 0;">
+<body style="margin:0;padding:0;background-color:#e8edf4;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#e8edf4;padding:40px 0;">
 <tr><td align="center">
 <table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
+
+  <!-- HEADER AZUL OSCURO -->
   <tr>
-    <td style="background:linear-gradient(90deg,#1d4ed8,#0ea5e9,#6366f1);height:4px;border-radius:4px 4px 0 0;font-size:0;line-height:0;">&nbsp;</td>
-  </tr>
-  <tr>
-    <td style="background:linear-gradient(160deg,#0f172a 0%,#1e2d4a 60%,#162040 100%);padding:52px 52px 40px;text-align:center;">
+    <td style="background:linear-gradient(160deg,#0a1628 0%,#1a3a6e 55%,#1e4d9b 100%);border-radius:16px 16px 0 0;padding:52px 52px 40px;text-align:center;">
       <img src="https://bcpscore.vercel.app/logo1.png" alt="BCMEX" style="height:56px;width:auto;display:block;margin:0 auto 28px;">
-      <div style="display:inline-block;background:rgba(30,64,175,0.35);border:1px solid rgba(96,165,250,0.25);border-radius:20px;padding:5px 18px;margin-bottom:20px;">
-        <span style="font-size:10px;color:#93c5fd;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Confidencial</span>
+      <div style="display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:5px 18px;margin-bottom:20px;">
+        <span style="font-size:10px;color:#bfdbfe;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Confidencial</span>
       </div>
-      <h1 style="margin:0 0 10px;font-size:28px;font-weight:300;color:#f0f6ff;letter-spacing:0.5px;line-height:1.3;">
+      <h1 style="margin:0 0 10px;font-size:28px;font-weight:300;color:#ffffff;letter-spacing:0.5px;line-height:1.3;">
         Diagn&#243;stico de<br><strong style="font-weight:700;">Resiliencia Empresarial</strong>
       </h1>
-      <p style="margin:0;font-size:12px;color:rgba(148,163,184,0.7);letter-spacing:2.5px;text-transform:uppercase;">Plan de Continuidad de Negocio</p>
-      <div style="margin:28px auto 0;width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(96,165,250,0.6),transparent);"></div>
+      <p style="margin:0;font-size:12px;color:rgba(191,219,254,0.8);letter-spacing:2.5px;text-transform:uppercase;">Plan de Continuidad de Negocio</p>
+      <div style="margin:28px auto 0;width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);"></div>
     </td>
   </tr>
+
+  <!-- CUERPO BLANCO -->
   <tr>
-    <td style="background:#111827;padding:36px 52px 24px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
-      <p style="margin:0 0 6px;font-size:13px;color:#64748b;letter-spacing:2px;text-transform:uppercase;">Preparado para</p>
-      <p style="margin:0 0 20px;font-size:22px;font-weight:600;color:#e2e8f0;">${safeName}</p>
-      <p style="margin:0;font-size:14px;color:#94a3b8;line-height:1.85;">
+    <td style="background:#ffffff;padding:36px 52px 24px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
+      <p style="margin:0 0 6px;font-size:13px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;">Preparado para</p>
+      <p style="margin:0 0 20px;font-size:22px;font-weight:600;color:#0f172a;">${safeName}</p>
+      <p style="margin:0;font-size:14px;color:#475569;line-height:1.85;">
         Hemos concluido el an&#225;lisis de resiliencia de su organizaci&#243;n.
         A continuaci&#243;n encontrar&#225; los resultados detallados y las recomendaciones
         de nuestro equipo especializado en continuidad de negocio.
       </p>
     </td>
   </tr>
+
+  <!-- SEPARADOR -->
   <tr>
-    <td style="background:#111827;padding:8px 52px 20px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;text-align:center;">
-      <div style="height:1px;width:70px;background:linear-gradient(90deg,transparent,#334155);display:inline-block;vertical-align:middle;"></div>
-      <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#475569;padding:0 12px;vertical-align:middle;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
-      <div style="height:1px;width:70px;background:linear-gradient(90deg,#334155,transparent);display:inline-block;vertical-align:middle;"></div>
+    <td style="background:#ffffff;padding:8px 52px 20px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;text-align:center;">
+      <div style="height:1px;width:70px;background:linear-gradient(90deg,transparent,#bdd7f5);display:inline-block;vertical-align:middle;"></div>
+      <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#94a3b8;padding:0 12px;vertical-align:middle;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
+      <div style="height:1px;width:70px;background:linear-gradient(90deg,#bdd7f5,transparent);display:inline-block;vertical-align:middle;"></div>
     </td>
   </tr>
+
+  <!-- CONTENIDO IA -->
   <tr>
-    <td style="background:#111827;padding:0 52px 36px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
-      <div style="background:#0f172a;border:1px solid #1e3a5f;border-left:4px solid #3b82f6;border-radius:0 12px 12px 0;padding:28px 30px;">
-        <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3b82f6;font-weight:600;">&#128203; An&#225;lisis de Resultados</p>
-        <p style="margin:0;font-size:14px;color:#cbd5e1;line-height:2;white-space:pre-line;">${correoCliente.replace(/\n/g, '<br>')}</p>
+    <td style="background:#ffffff;padding:0 52px 36px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
+      <div style="background:#f0f7ff;border:1px solid #dce8f7;border-left:4px solid #1a3a6e;border-radius:0 10px 10px 0;padding:28px 30px;">
+        <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1a3a6e;font-weight:600;">&#128203; An&#225;lisis de Resultados</p>
+        <p style="margin:0;font-size:14px;color:#1e293b;line-height:2;white-space:pre-line;">${correoCliente.replace(/\n/g, '<br>')}</p>
       </div>
     </td>
   </tr>
+
+  <!-- DIVISOR -->
   <tr>
-    <td style="background:#111827;padding:0 52px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
-      <div style="height:1px;background:linear-gradient(90deg,transparent,#1e3a5f,transparent);"></div>
+    <td style="background:#ffffff;padding:0 52px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
+      <div style="height:1px;background:linear-gradient(90deg,transparent,#dce8f7,transparent);"></div>
     </td>
   </tr>
+
+  <!-- CTA -->
   <tr>
-    <td style="background:#111827;padding:32px 52px 44px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+    <td style="background:#ffffff;padding:32px 52px 44px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="background:linear-gradient(135deg,#0f2044,#162952);border:1px solid #1e3f7a;border-radius:14px;padding:28px 32px;text-align:center;">
-            <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:#e2e8f0;">&#191;Listo para el siguiente paso?</p>
-            <p style="margin:0 0 22px;font-size:13px;color:#64748b;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
-            <a href="https://bcmex.mx" style="display:inline-block;background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 40px;border-radius:30px;">
+          <td style="background:linear-gradient(135deg,#eaf2ff,#dbeafe);border:1px solid #bdd7f5;border-radius:14px;padding:28px 32px;text-align:center;">
+            <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:#0f172a;">&#191;Listo para el siguiente paso?</p>
+            <p style="margin:0 0 22px;font-size:13px;color:#475569;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
+            <a href="https://bcmex.mx" style="display:inline-block;background:linear-gradient(135deg,#1a3a6e,#1e4d9b);color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 40px;border-radius:30px;">
               Visitar BCMEX.mx &nbsp;&#8594;
             </a>
           </td>
@@ -233,20 +242,20 @@ async function procesarIAyCorreo(data, dbKey) {
       </table>
     </td>
   </tr>
+
+  <!-- FOOTER AZUL OSCURO -->
   <tr>
-    <td style="background:#0a0f1a;border-top:1px solid #1e293b;border-left:1px solid #1e293b;border-right:1px solid #1e293b;padding:30px 52px;text-align:center;">
-      <p style="margin:0 0 4px;font-size:15px;color:#e2e8f0;letter-spacing:4px;font-weight:300;">BCMEX</p>
-      <p style="margin:0 0 16px;font-size:10px;color:#334155;letter-spacing:1.5px;text-transform:uppercase;">Resiliencia Empresarial &nbsp;&#183;&nbsp; Continuidad de Negocio</p>
-      <div style="height:1px;background:#1e293b;margin:0 auto 16px;width:40px;"></div>
-      <p style="margin:0;font-size:11px;color:#334155;line-height:1.8;">
+    <td style="background:linear-gradient(135deg,#0a1628,#1a3a6e);border-radius:0 0 16px 16px;padding:30px 52px;text-align:center;">
+      <p style="margin:0 0 4px;font-size:15px;color:#ffffff;letter-spacing:4px;font-weight:300;">BCMEX</p>
+      <p style="margin:0 0 16px;font-size:10px;color:rgba(191,219,254,0.65);letter-spacing:1.5px;text-transform:uppercase;">Resiliencia Empresarial &nbsp;&#183;&nbsp; Continuidad de Negocio</p>
+      <div style="height:1px;background:rgba(255,255,255,0.1);margin:0 auto 16px;width:40px;"></div>
+      <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.8;">
         Este correo es confidencial y est&#225; dirigido exclusivamente a su destinatario.<br>
-        <a href="https://bcmex.mx" style="color:#475569;text-decoration:none;">www.bcmex.mx</a>
+        <a href="https://bcmex.mx" style="color:rgba(191,219,254,0.55);text-decoration:none;">www.bcmex.mx</a>
       </p>
     </td>
   </tr>
-  <tr>
-    <td style="background:linear-gradient(90deg,#6366f1,#0ea5e9,#1d4ed8);height:3px;border-radius:0 0 4px 4px;font-size:0;line-height:0;">&nbsp;</td>
-  </tr>
+
   <tr><td style="height:40px;"></td></tr>
 </table>
 </td></tr>
