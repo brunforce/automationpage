@@ -162,37 +162,56 @@ async function procesarIAyCorreo(data, dbKey) {
 
     // Correo Cliente
     const htmlCliente = `<!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#e8edf4;font-family:'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#e8edf4;padding:40px 0;">
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f0f4f8" style="background-color:#f0f4f8;padding:40px 0;">
 <tr><td align="center">
 <table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
 
-  <!-- HEADER AZUL OSCURO -->
+  <!-- HEADER - VML gradient para Outlook, CSS gradient para el resto -->
   <tr>
-    <td style="background:linear-gradient(160deg,#0a1628 0%,#1a3a6e 55%,#1e4d9b 100%);border-radius:16px 16px 0 0;padding:52px 52px 40px;text-align:center;">
-      <img src="https://bcpscore.vercel.app/api/logo2.png" alt="BCMEX" style="height:70px;width:auto;display:block;margin:0 auto 24px;">
-      <div style="display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:5px 18px;margin-bottom:20px;">
-        <span style="font-size:10px;color:#bfdbfe;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Confidencial</span>
-      </div>
-      <h1 style="margin:0 0 10px;font-size:28px;font-weight:300;color:#ffffff;letter-spacing:0.5px;line-height:1.3;">
-        Diagn&#243;stico de<br><strong style="font-weight:700;">Resiliencia Empresarial</strong>
-      </h1>
-      <p style="margin:0;font-size:12px;color:rgba(191,219,254,0.8);letter-spacing:2.5px;text-transform:uppercase;">Plan de Continuidad de Negocio</p>
-      <div style="margin:28px auto 0;width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);"></div>
+    <td bgcolor="#1a3a6e" style="padding:0;background:#1a3a6e;">
+      <!--[if gte mso 9]>
+      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;">
+        <v:fill type="gradient" color="#0a1628" color2="#1e4d9b" angle="160" focus="100%"/>
+        <v:textbox inset="0,0,0,0" style="mso-fit-shape-to-text:true">
+      <![endif]-->
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" bgcolor="#1a3a6e" style="padding:52px 52px 40px;background:linear-gradient(160deg,#0a1628 0%,#1a3a6e 55%,#1e4d9b 100%);">
+            <img src="https://bcpscore.vercel.app/api/logo2.png" alt="BCMEX" width="70" height="70" style="display:block;margin:0 auto 24px;border:0;outline:none;text-decoration:none;" border="0">
+            <table cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 20px;">
+              <tr>
+                <td align="center" bgcolor="#1e4d9b" style="background:#1e4d9b;border:1px solid #3b6bbf;padding:6px 20px;">
+                  <span style="font-size:10px;color:#bfdbfe;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Confidencial</span>
+                </td>
+              </tr>
+            </table>
+            <h1 style="margin:0 0 10px;font-size:28px;font-weight:300;color:#ffffff;letter-spacing:0.5px;line-height:36px;mso-line-height-rule:exactly;">
+              Diagn&#243;stico de<br><strong style="font-weight:700;">Resiliencia Empresarial</strong>
+            </h1>
+            <p style="margin:0;font-size:12px;color:#bfdbfe;letter-spacing:2.5px;text-transform:uppercase;">Plan de Continuidad de Negocio</p>
+            <table width="80" cellpadding="0" cellspacing="0" align="center" style="margin:28px auto 0;">
+              <tr><td height="1" bgcolor="#5b8dd9" style="font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <!--[if gte mso 9]></v:textbox></v:rect><![endif]-->
     </td>
   </tr>
 
   <!-- CUERPO BLANCO -->
   <tr>
-    <td style="background:#ffffff;padding:36px 52px 24px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
-      <p style="margin:0 0 6px;font-size:13px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;">Preparado para</p>
-      <p style="margin:0 0 20px;font-size:22px;font-weight:600;color:#0f172a;">${safeName}</p>
-      <p style="margin:0;font-size:14px;color:#475569;line-height:1.85;">
+    <td bgcolor="#ffffff" style="background:#ffffff;padding:36px 52px 24px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
+      <p style="margin:0 0 6px;font-size:13px;color:#4a7cb5;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Preparado para</p>
+      <p style="margin:0 0 20px;font-size:22px;font-weight:700;color:#0a1628;">${safeName}</p>
+      <p style="margin:0;font-size:14px;color:#334155;line-height:1.85;">
         Hemos concluido el an&#225;lisis de resiliencia de su organizaci&#243;n.
         A continuaci&#243;n encontrar&#225; los resultados detallados y las recomendaciones
         de nuestro equipo especializado en continuidad de negocio.
@@ -202,61 +221,89 @@ async function procesarIAyCorreo(data, dbKey) {
 
   <!-- SEPARADOR -->
   <tr>
-    <td style="background:#ffffff;padding:8px 52px 20px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;text-align:center;">
-      <div style="height:1px;width:70px;background:linear-gradient(90deg,transparent,#bdd7f5);display:inline-block;vertical-align:middle;"></div>
-      <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#94a3b8;padding:0 12px;vertical-align:middle;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
-      <div style="height:1px;width:70px;background:linear-gradient(90deg,#bdd7f5,transparent);display:inline-block;vertical-align:middle;"></div>
+    <td bgcolor="#ffffff" style="background:#ffffff;padding:8px 52px 20px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="70" height="1" bgcolor="#bdd7f5" style="font-size:0;line-height:0;">&nbsp;</td>
+          <td align="center" style="padding:0 12px;">
+            <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#4a7cb5;font-weight:600;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
+          </td>
+          <td width="70" height="1" bgcolor="#bdd7f5" style="font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+      </table>
     </td>
   </tr>
 
   <!-- CONTENIDO IA -->
   <tr>
-    <td style="background:#ffffff;padding:0 52px 36px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
-      <div style="background:#f0f7ff;border:1px solid #dce8f7;border-left:4px solid #1a3a6e;border-radius:0 10px 10px 0;padding:28px 30px;">
-        <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1a3a6e;font-weight:600;">&#128203; An&#225;lisis de Resultados</p>
-        <p style="margin:0;font-size:14px;color:#1e293b;line-height:2;white-space:pre-line;">${correoCliente.replace(/\n/g, '<br>')}</p>
-      </div>
-    </td>
-  </tr>
-
-  <!-- DIVISOR -->
-  <tr>
-    <td style="background:#ffffff;padding:0 52px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
-      <div style="height:1px;background:linear-gradient(90deg,transparent,#dce8f7,transparent);"></div>
-    </td>
-  </tr>
-
-  <!-- CTA -->
-  <tr>
-    <td style="background:#ffffff;padding:32px 52px 44px;border-left:1px solid #dce8f7;border-right:1px solid #dce8f7;">
+    <td bgcolor="#ffffff" style="background:#ffffff;padding:0 52px 36px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="background:linear-gradient(135deg,#eaf2ff,#dbeafe);border:1px solid #bdd7f5;border-radius:14px;padding:28px 32px;text-align:center;">
-            <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:#0f172a;">&#191;Listo para el siguiente paso?</p>
-            <p style="margin:0 0 22px;font-size:13px;color:#475569;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
-            <a href="https://bcmex.mx" style="display:inline-block;background:linear-gradient(135deg,#1a3a6e,#1e4d9b);color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 40px;border-radius:30px;">
-              Visitar BCMEX.mx &nbsp;&#8594;
-            </a>
+          <td bgcolor="#f5f9ff" style="background:#f5f9ff;border-left:5px solid #1a3a6e;padding:28px 30px;">
+            <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1a3a6e;font-weight:600;">&#128203; An&#225;lisis de Resultados</p>
+            <p style="margin:0;font-size:14px;color:#0a1628;line-height:28px;mso-line-height-rule:exactly;">${correoCliente.replace(/\n/g, '<br>')}</p>
           </td>
         </tr>
       </table>
     </td>
   </tr>
 
-  <!-- FOOTER AZUL OSCURO -->
+  <!-- DIVISOR -->
   <tr>
-    <td style="background:linear-gradient(135deg,#0a1628,#1a3a6e);border-radius:0 0 16px 16px;padding:30px 52px;text-align:center;">
-      <p style="margin:0 0 4px;font-size:15px;color:#ffffff;letter-spacing:4px;font-weight:300;">BCMEX</p>
-      <p style="margin:0 0 16px;font-size:10px;color:rgba(191,219,254,0.65);letter-spacing:1.5px;text-transform:uppercase;">Resiliencia Empresarial &nbsp;&#183;&nbsp; Continuidad de Negocio</p>
-      <div style="height:1px;background:rgba(255,255,255,0.1);margin:0 auto 16px;width:40px;"></div>
-      <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.8;">
-        Este correo es confidencial y est&#225; dirigido exclusivamente a su destinatario.<br>
-        <a href="https://bcmex.mx" style="color:rgba(191,219,254,0.55);text-decoration:none;">www.bcmex.mx</a>
-      </p>
+    <td bgcolor="#ffffff" style="background:#ffffff;padding:0 52px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
+      <table width="100%" cellpadding="0" cellspacing="0"><tr><td height="1" bgcolor="#dce8f7" style="font-size:0;line-height:0;">&nbsp;</td></tr></table>
     </td>
   </tr>
 
-  <tr><td style="height:40px;"></td></tr>
+  <!-- CTA -->
+  <tr>
+    <td bgcolor="#ffffff" style="background:#ffffff;padding:32px 52px 44px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" bgcolor="#e8f0fd" style="background:#e8f0fd;border:1px solid #bdd7f5;padding:28px 32px;">
+            <p style="margin:0 0 6px;font-size:17px;font-weight:700;color:#0a1628;">&#191;Listo para el siguiente paso?</p>
+            <p style="margin:0 0 22px;font-size:13px;color:#334155;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
+            <table cellpadding="0" cellspacing="0" align="center">
+              <tr>
+                <td align="center" bgcolor="#1a3a6e" style="background:#1a3a6e;padding:14px 40px;">
+                  <a href="https://bcmex.mx" style="color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Visitar BCMEX.mx &nbsp;&#8594;</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- FOOTER - VML para Outlook -->
+  <tr>
+    <td bgcolor="#0f2348" style="padding:0;background:#0f2348;">
+      <!--[if gte mso 9]>
+      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:620px;">
+        <v:fill type="gradient" color="#0a1628" color2="#1a3a6e" angle="135" focus="100%"/>
+        <v:textbox inset="0,0,0,0" style="mso-fit-shape-to-text:true">
+      <![endif]-->
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" bgcolor="#0f2348" style="padding:30px 52px;background:linear-gradient(135deg,#0a1628,#1a3a6e);">
+            <p style="margin:0 0 4px;font-size:15px;color:#ffffff;letter-spacing:4px;font-weight:300;">BCMEX</p>
+            <p style="margin:0 0 16px;font-size:10px;color:#8fb8e8;letter-spacing:1.5px;text-transform:uppercase;">Resiliencia Empresarial &nbsp;&#183;&nbsp; Continuidad de Negocio</p>
+            <table width="40" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 16px;">
+              <tr><td height="1" bgcolor="#2d5a9e" style="font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
+            <p style="margin:0;font-size:11px;color:#6b8cba;line-height:18px;mso-line-height-rule:exactly;">
+              Este correo es confidencial y est&#225; dirigido exclusivamente a su destinatario.<br>
+              <a href="https://bcmex.mx" style="color:#8fb8e8;text-decoration:none;">www.bcmex.mx</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+      <!--[if gte mso 9]></v:textbox></v:rect><![endif]-->
+    </td>
+  </tr>
+
+  <tr><td bgcolor="#f0f4f8" style="height:40px;">&nbsp;</td></tr>
 </table>
 </td></tr>
 </table>
@@ -270,50 +317,54 @@ async function procesarIAyCorreo(data, dbKey) {
       HtmlBody: htmlCliente
     };
 
-    // Correo Interno — todos los campos del usuario van escapados
+    // Correo Interno
     const htmlInterno = `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"></head>
+<html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="UTF-8">
+<!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
+</head>
 <body style="margin:0;padding:0;background:#0d1117;font-family:'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#0d1117;padding:30px 0;">
+<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#0d1117" style="background:#0d1117;padding:30px 0;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-  <!-- Barra superior: fallback sólido para Outlook -->
+  <!-- Barra superior amber/roja: sólido para Outlook -->
   <tr>
-    <td style="background:#f59e0b;height:3px;font-size:0;line-height:0;">
+    <td bgcolor="#f59e0b" height="3" style="font-size:0;line-height:0;background:#f59e0b;">
       <!--[if !mso]><!-->
       <div style="background:linear-gradient(90deg,#f59e0b,#ef4444);height:3px;font-size:0;line-height:0;"></div>
       <!--<![endif]-->
     </td>
   </tr>
 
-  <!-- HEADER oscuro - Outlook compatible via VML -->
+  <!-- HEADER oscuro - VML para Outlook -->
   <tr>
-    <td style="background:#1a1a2e;padding:0;text-align:center;">
+    <td bgcolor="#1a1a2e" style="padding:0;background:#1a1a2e;">
       <!--[if gte mso 9]>
       <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;">
-        <v:fill type="gradient" color="#1a1a2e" color2="#16213e" angle="135"/>
-        <v:textbox inset="0,0,0,0">
+        <v:fill type="gradient" color="#1a1a2e" color2="#16213e" angle="135" focus="100%"/>
+        <v:textbox inset="0,0,0,0" style="mso-fit-shape-to-text:true">
       <![endif]-->
-      <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);padding:28px 36px;text-align:center;">
-        <p style="margin:0 0 6px;font-size:10px;letter-spacing:4px;color:#fbbf24;text-transform:uppercase;">&#128293; Nuevo Lead Detectado</p>
-        <h2 style="margin:0 0 6px;font-size:20px;font-weight:600;color:#f0f6ff;">${safeName}</h2>
-        <p style="margin:0;font-size:12px;color:#7fb3e8;">${safeEmail}</p>
-      </div>
-      <!--[if gte mso 9]>
-        </v:textbox>
-      </v:rect>
-      <![endif]-->
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" bgcolor="#1a1a2e" style="padding:28px 36px;background:linear-gradient(135deg,#1a1a2e,#16213e);">
+            <p style="margin:0 0 6px;font-size:10px;letter-spacing:4px;color:#fbbf24;text-transform:uppercase;">&#128293; Nuevo Lead Detectado</p>
+            <h2 style="margin:0 0 6px;font-size:20px;font-weight:600;color:#f0f6ff;line-height:28px;mso-line-height-rule:exactly;">${safeName}</h2>
+            <p style="margin:0;font-size:12px;color:#7fb3e8;">${safeEmail}</p>
+          </td>
+        </tr>
+      </table>
+      <!--[if gte mso 9]></v:textbox></v:rect><![endif]-->
     </td>
   </tr>
 
   <!-- Teléfono -->
   <tr>
-    <td style="background:#111827;padding:24px 36px 8px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+    <td bgcolor="#111827" style="background:#111827;padding:24px 36px 8px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="padding:8px 12px;background:#0f172a;border:1px solid #1e293b;">
+          <td bgcolor="#0f172a" style="background:#0f172a;border:1px solid #1e293b;padding:8px 12px;">
             <span style="font-size:11px;color:#64748b;">Tel&#233;fono</span><br>
             <span style="font-size:13px;color:#e2e8f0;font-weight:500;">${safePhone}</span>
           </td>
@@ -324,28 +375,28 @@ async function procesarIAyCorreo(data, dbKey) {
 
   <!-- Análisis interno -->
   <tr>
-    <td style="background:#111827;padding:16px 36px 32px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
-      <p style="margin:0 0 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#f59e0b;font-weight:600;">&#128202; An&#225;lisis Interno · Equipo BCMEX</p>
+    <td bgcolor="#111827" style="background:#111827;padding:16px 36px 32px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
+      <p style="margin:0 0 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#f59e0b;font-weight:600;">&#128202; An&#225;lisis Interno &middot; Equipo BCMEX</p>
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="background:#0f172a;border-left:4px solid #f59e0b;padding:20px 22px;">
-            <p style="margin:0;font-size:13px;color:#cbd5e1;line-height:1.85;white-space:pre-line;">${analisisInterno.replace(/\n/g, '<br>')}</p>
+          <td bgcolor="#0f172a" style="background:#0f172a;border-left:4px solid #f59e0b;padding:20px 22px;">
+            <p style="margin:0;font-size:13px;color:#cbd5e1;line-height:24px;mso-line-height-rule:exactly;">${analisisInterno.replace(/\n/g, '<br>')}</p>
           </td>
         </tr>
       </table>
     </td>
   </tr>
 
-  <!-- Footer -->
+  <!-- Footer interno -->
   <tr>
-    <td style="background:#0a0f1a;border-top:1px solid #1e293b;border-left:1px solid #1e293b;border-right:1px solid #1e293b;padding:16px 36px;text-align:center;">
+    <td bgcolor="#0a0f1a" style="background:#0a0f1a;border-top:1px solid #1e293b;border-left:1px solid #1e293b;border-right:1px solid #1e293b;padding:16px 36px;text-align:center;">
       <p style="margin:0;font-size:11px;color:#4a5568;">Notificaci&#243;n interna BCMEX &nbsp;&#183;&nbsp; No responder a este correo</p>
     </td>
   </tr>
 
-  <!-- Barra inferior: fallback sólido para Outlook -->
+  <!-- Barra inferior: sólido para Outlook -->
   <tr>
-    <td style="background:#ef4444;height:3px;font-size:0;line-height:0;">
+    <td bgcolor="#ef4444" height="3" style="font-size:0;line-height:0;background:#ef4444;">
       <!--[if !mso]><!-->
       <div style="background:linear-gradient(90deg,#ef4444,#f59e0b);height:3px;font-size:0;line-height:0;"></div>
       <!--<![endif]-->
