@@ -175,7 +175,7 @@ async function procesarIAyCorreo(data, dbKey) {
   <!-- HEADER AZUL OSCURO -->
   <tr>
     <td style="background:linear-gradient(160deg,#0a1628 0%,#1a3a6e 55%,#1e4d9b 100%);border-radius:16px 16px 0 0;padding:52px 52px 40px;text-align:center;">
-      <img src="https://bcpscore.vercel.app/logo1.png" alt="BCMEX" style="height:56px;width:auto;display:block;margin:0 auto 28px;">
+      <img src="https://bcpscore.vercel.app/api/logo2.png" alt="BCMEX" style="height:70px;width:auto;display:block;margin:0 auto 24px;">
       <div style="display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:5px 18px;margin-bottom:20px;">
         <span style="font-size:10px;color:#bfdbfe;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Confidencial</span>
       </div>
