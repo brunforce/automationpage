@@ -151,8 +151,8 @@
             <span class="material-symbols-outlined text-3xl">phone_iphone</span>
         </div>
         <h3 class="text-2xl font-bold text-slate-900 mb-2">Un último paso...</h3>
-        <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico para que un experto pueda contactarte directamente con tu análisis.</p>
-        <input type="tel" id="user-phone-input" placeholder="Ej. 55 1234 5678" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
+        <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico (10 dígitos) para que un experto pueda contactarte directamente con tu análisis.</p>
+        <input type="tel" id="user-phone-input" maxlength="10" placeholder="Ej. 5512345678" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
         <button onclick="submitWithPhone()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-200 flex items-center justify-center gap-2 mb-4 group">
             Obtener Resultados <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
@@ -289,8 +289,12 @@
 </main>
 
 <script>
-        // ELIMINADAS LAS IMPORTACIONES DE FIREBASE.
-        // Toda la lógica de backend ocurre ahora en /api/guardar-lead
+        // CONFIGURACIÓN DE SEGURIDAD PARA MATCH CON BACKEND
+        const SECURITY_CONFIG = {
+            // El backend espera una cabecera llamada 'version' con el valor de API_SECRET
+            // Cambia este valor al TOKEN que configuraste en tus variables de entorno de Vercel (API_SECRET)
+            API_TOKEN: "TU_TOKEN_AQUÍ" 
+        };
 
         const prospectingQuestions = [
             { id: 'p1_market', text: "¿Cuál es la participación de mercado de su empresa en el país?", type: 'standard', options: [{ label: "Menos del 10%", val: 1 }, { label: "Entre 11% y 30%", val: 2 }, { label: "Entre 31% y 50%", val: 3 }, { label: "Mas del 51%", val: 4 }] },
@@ -399,7 +403,7 @@
             totalSteps.textContent = activeQuestions.length;
             progressBar.style.width = `${((currentStep) / activeQuestions.length) * 100}%`;
 
-            let html = `<h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3><div class="mb-8"></div><div class="grid grid-cols-1 md:grid-cols-1 gap-3">`;
+            let html = `<h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3><div class="mb-8"></div><div class="grid grid-cols-1 gap-3">`;
             q.options.forEach((opt, idx) => {
                 const labelArg = opt.label.replace(/'/g, "\\'");
                 html += `
@@ -415,6 +419,7 @@
         }
 
         window.selectAnswer = function(qid, val, label) {
+            // Guardamos con la estructura que el backend espera
             answers[qid] = { value: val, label: label };
             safeLogEvent('question_answered', { question_id: qid, answer_value: val });
 
@@ -498,13 +503,16 @@
 
         window.submitWithPhone = function() {
             const phone = document.getElementById('user-phone-input').value.trim();
-            if (phone !== "" && !/^\d{10}$/.test(phone)) return alert("Use formato válido (p.ej: 8112345678)");
+            // Nueva Validación Estricta: Si hay teléfono, deben ser 10 dígitos numéricos exactos
+            if (phone !== "" && !/^[0-9]{10}$/.test(phone)) {
+                return alert("El número telefónico debe ser de 10 dígitos numéricos (ej: 8112345678).");
+            }
             finalSubmit(phone);
         }
 
         window.submitWithoutPhone = function() { finalSubmit(""); }
 
-        // --- CONEXIÓN DIRECTA Y SEGURA A LA API DE VERCEL ---
+        // --- CONEXIÓN COMPATIBLE CON LA VERSIÓN SEGURA DEL BACKEND ---
         window.finalSubmit = async function(phoneNumber) {
             phoneModal.classList.add('hidden');
             const btn = document.getElementById('btn-inline-submit');
@@ -522,10 +530,13 @@
             };
 
             try {
-                // Fetch al backend seguro que acabamos de crear en Vercel
+                // Fetch al backend enviando la cabecera 'version' (Token de Seguridad)
                 const response = await fetch('/api/guardar-lead', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'version': SECURITY_CONFIG.API_TOKEN // Token obligatorio por el nuevo backend
+                    },
                     body: JSON.stringify(payload)
                 });
 
@@ -539,7 +550,7 @@
                 }
             } catch (error) {
                 console.error("Fetch error:", error);
-                alert("Hubo un error al procesar la solicitud: " + error.message);
+                alert("Hubo un problema de seguridad o validación: " + error.message);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -548,5 +559,4 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
-</body>
-</html>
+</body></html>
