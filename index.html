@@ -5,6 +5,24 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+
+<!-- Google tag (gtag.js) - Google Analytics Original -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z7V7Y6JMMW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Z7V7Y6JMMW');
+
+  window.safeLogEvent = function(eventName, params) {
+      try {
+          gtag('event', eventName, params);
+      } catch (e) {
+          console.warn("Analytics no disponible:", e);
+      }
+  };
+</script>
+
 <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
@@ -19,12 +37,6 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         @media print {
@@ -42,9 +54,6 @@
             }
             .print-break-inside { break-inside: avoid; }
             .print-container { max-width: 100% !important; padding: 0 20px !important; margin-top: 20px !important; }
-            .print-header-image { height: 150px !important; opacity: 0.5 !important; }
-            h1, h2, h3 { color: #0f172a !important; }
-            p, li { color: #334155 !important; }
         }
     </style>
 </head>
@@ -91,7 +100,6 @@
     </div>
 </nav>
 
-<!-- Main Content Area -->
 <main class="flex-1 mt-20 relative overflow-hidden flex flex-col" id="app-container">
 <!-- Hero Section -->
 <section class="absolute inset-0 z-10 flex items-center justify-center bg-slate-900" id="hero-section">
@@ -101,8 +109,7 @@
     </div>
     <div class="relative z-20 max-w-5xl text-center px-6 flex flex-col items-center">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight slide-up drop-shadow-lg">
-            ¿Qué tan resiliente es tu<br class="hidden md:block">
-            negocio ante el caos?
+            ¿Qué tan resiliente es tu<br class="hidden md:block"> negocio ante el caos?
         </h1>
         <div class="w-full max-w-2xl h-0.5 bg-blue-500 rounded-full mb-8 opacity-80 slide-up" style="animation-delay: 0.1s;"></div>
         <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 slide-up drop-shadow-md italic" style="animation-delay: 0.2s;">
@@ -118,7 +125,7 @@
     </div>
 </section>
 
-<!-- Modal 1: Nombre del Usuario -->
+<!-- Modal 1: Nombre -->
 <div id="name-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm px-4">
     <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl scale-in">
         <div class="flex items-center gap-3 mb-2">
@@ -126,20 +133,17 @@
             <h3 class="text-2xl font-bold text-slate-900">Antes de comenzar</h3>
         </div>
         <p class="text-slate-500 mb-6 text-sm">Por favor, indícanos tu nombre para personalizar tu diagnóstico.</p>
-        
         <input type="text" id="user-name-input" maxlength="40" placeholder="Ej. Juan Pérez" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-8 text-lg font-medium text-slate-700" onkeypress="handleNameKeypress(event)">
-        
         <div class="flex justify-end gap-3">
             <button onclick="closeNameModal()" class="px-5 py-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-xl font-medium transition">Cancelar</button>
             <button onclick="submitNameAndStart()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition shadow-lg shadow-blue-200 flex items-center gap-2">
-                Continuar
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                Continuar <span class="material-symbols-outlined text-sm">arrow_forward</span>
             </button>
         </div>
     </div>
 </div>
 
-<!-- Modal 2: Solicitar Teléfono -->
+<!-- Modal 2: Teléfono -->
 <div id="phone-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm px-4">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl scale-in text-center relative overflow-hidden">
         <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
@@ -148,21 +152,17 @@
         </div>
         <h3 class="text-2xl font-bold text-slate-900 mb-2">Un último paso...</h3>
         <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico para que un experto pueda contactarte directamente con tu análisis.</p>
-        
         <input type="tel" id="user-phone-input" placeholder="Ej. 55 1234 5678" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
-        
         <button onclick="submitWithPhone()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-200 flex items-center justify-center gap-2 mb-4 group">
-            Obtener Resultados
-            <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            Obtener Resultados <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
-        
         <button onclick="submitWithoutPhone()" class="text-slate-400 hover:text-slate-600 text-xs font-medium underline underline-offset-4 transition">
             Omitir y enviar resultados al correo
         </button>
     </div>
 </div>
 
-<!-- Assessment Wizard -->
+<!-- Wizard -->
 <section class="absolute inset-0 z-20 hidden flex flex-col bg-slate-50" id="wizard-section">
 <div class="w-full bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10 relative">
 <div class="flex items-center gap-4">
@@ -176,7 +176,7 @@
 </div>
 </div>
 </div>
-<div class="hidden sm:block text-slate-500 text-sm italic" id="fun-fact-ticker" style="opacity: 1;">El costo promedio de inactividad es de $5,600 USD por minuto. (Gartner)</div>
+<div class="hidden sm:block text-slate-500 text-sm italic" id="fun-fact-ticker"></div>
 </div>
 <div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-start">
     <div class="w-full flex items-center justify-center min-h-min py-8">
@@ -186,7 +186,7 @@
 </div>
 </section>
 
-<!-- Loading Analysis Screen -->
+<!-- Loading -->
 <section class="absolute inset-0 z-30 hidden bg-white flex flex-col items-center justify-center text-center p-6" id="loading-section">
 <div class="relative w-24 h-24 mb-8">
 <svg class="animate-spin w-full h-full text-blue-600" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -202,28 +202,27 @@
 <span class="material-symbols-outlined text-blue-600 mt-1">lightbulb</span>
 <div>
 <h4 class="font-bold text-blue-900 text-sm uppercase mb-1">¿Sabías que?</h4>
-<p class="text-blue-800 text-sm leading-relaxed" id="loading-fact">El 60% de las pequeñas empresas cierran dentro de los 6 meses posteriores a un ciberataque.</p>
+<p class="text-blue-800 text-sm leading-relaxed" id="loading-fact"></p>
 </div>
 </div>
 </div>
 </section>
 
-<!-- Results Dashboard -->
+<!-- Results -->
 <section class="absolute inset-0 z-40 hidden bg-slate-50 overflow-y-auto" id="results-section">
 <div class="bg-slate-900 text-white pt-12 pb-24 px-6 relative overflow-hidden print-break-inside">
 <img class="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay print-header-image" src="background1.png" onerror="this.src='https://images.unsplash.com/photo-1558494949-efc535b5fa12?q=80&w=2070'">
 <div class="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
 <div>
 <h2 class="text-3xl font-bold mb-2">Diagnóstico de Madurez BCP</h2>
-<p class="text-slate-400">Generado para <span id="display-user-name" class="font-semibold text-blue-400">su empresa</span></p>
+<p class="text-slate-400">Generado el <span id="current-date"></span> para <span id="display-user-name" class="font-semibold text-blue-400">su empresa</span></p>
 </div>
 </div>
 </div>
 
 <div class="max-w-6xl mx-auto px-6 -mt-16 relative z-20 pb-20 print-container">
     <div class="flex flex-col md:flex-row gap-6 items-start justify-center">
-
-        <!-- Columna Izquierda: Resultados principales -->
+        <!-- Columna Izquierda -->
         <div class="flex-1 w-full bg-white rounded-2xl shadow-lg border border-slate-100 p-8 text-center print-break-inside">
             <div>
                 <h3 class="text-slate-500 font-medium text-sm uppercase tracking-wider mb-6">Puntaje Acumulado</h3>
@@ -242,16 +241,13 @@
                 <div class="mb-4" id="score-label-container">
                     <span class="px-4 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700" id="score-badge">Calculando...</span>
                 </div>
-                <p class="text-slate-600 text-sm leading-relaxed mb-8 max-w-lg mx-auto" id="score-description">
-                    Su empresa muestra vulnerabilidades significativas en la gestión de continuidad.
-                </p>
+                <p class="text-slate-600 text-sm leading-relaxed mb-8 max-w-lg mx-auto" id="score-description"></p>
                 
                 <div class="bg-blue-50 rounded-xl p-6 border border-blue-100 mt-8" id="inline-email-form">
                     <h4 class="text-lg font-bold text-slate-800 mb-2">¿Quieres ver los detalles de esta evaluación?</h4>
-                    <p class="text-slate-600 text-sm mb-4">Ingresa tu correo aquí para mandarte los detalles completos.</p>
+                    <p class="text-slate-600 text-sm mb-4">Ingresa tu correo aquí para enviarte los resultados del diagnóstico con IA.</p>
                     <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto relative">
-                        <input type="email" id="inline-user-email" class="flex-1 px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="nombre@empresa.com">
-                        
+                        <input type="email" id="inline-user-email" class="flex-1 px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="nombre@empresa.com">
                         <button onclick="handleInlineSubmit()" id="btn-inline-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg flex items-center justify-center gap-2">
                             <span>Continuar</span>
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
@@ -261,17 +257,13 @@
             </div>
         </div>
 
-        <!-- Columna Derecha: BCMEX Service Pitch -->
+        <!-- Columna Derecha -->
         <div class="w-full md:w-[320px] shrink-0 bg-gradient-to-br from-blue-900 to-slate-900 rounded-2xl p-6 text-white relative overflow-hidden shadow-xl print-break-inside no-print">
             <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20 -mr-12 -mt-12"></div>
-            
             <div class="relative z-10 flex flex-col items-start text-left gap-2">
                 <h3 class="text-xl font-bold mb-1">Mejore su puntaje con BCMEX</h3>
-                <p class="text-blue-200 text-sm leading-relaxed" id="pitch-text">
-                    Nuestros expertos pueden implementar un BCP a medida que garantice la resiliencia operativa de su negocio.
-                </p>
+                <p class="text-blue-200 text-sm leading-relaxed" id="pitch-text"></p>
             </div>
-
             <div class="relative z-10 mt-6 pt-6 border-t border-blue-800/60 flex flex-col gap-4">
                 <a href="mailto:comercial@bcmex.mx" class="flex items-center gap-3 text-blue-200 hover:text-white transition group">
                     <div class="bg-blue-800/50 p-2.5 rounded-lg group-hover:bg-blue-600 transition shadow-sm">
@@ -287,7 +279,6 @@
                 </a>
             </div>
         </div>
-
     </div> 
 
     <div class="mt-12 text-center no-print">
@@ -295,12 +286,11 @@
     </div>
 </div>
 </section>
-
 </main>
 
 <script>
-        // ELIMINADA TODA REFERENCIA A LIBRERÍAS DE FIREBASE
-        // SOLO JAVASCRIPT PURO PARA LA INTERFAZ Y EL FETCH AL BACKEND DE VERCEL
+        // ELIMINADAS LAS IMPORTACIONES DE FIREBASE.
+        // Toda la lógica de backend ocurre ahora en /api/guardar-lead
 
         const prospectingQuestions = [
             { id: 'p1_market', text: "¿Cuál es la participación de mercado de su empresa en el país?", type: 'standard', options: [{ label: "Menos del 10%", val: 1 }, { label: "Entre 11% y 30%", val: 2 }, { label: "Entre 31% y 50%", val: 3 }, { label: "Mas del 51%", val: 4 }] },
@@ -324,8 +314,8 @@
         ];
 
         const funFacts = [
-            "El 93% de las empresas que pierden su data center por 10 días quiebran en un año. (FEMA)",
-            "El costo promedio de inactividad es de $5,600 USD por minuto. (Gartner)",
+            "El 93% de las empresas que pierden su data center por 10 días quiebran en un año.",
+            "El costo promedio de inactividad es de $5,600 USD por minuto.",
             "60% de las PyMEs cierran tras 6 meses de un ciberataque grave.",
             "Solo el 54% de las empresas tienen un plan de recuperación ante desastres formal.",
             "El error humano causa el 23% de las brechas de seguridad y pérdida de datos."
@@ -338,7 +328,7 @@
         let currentMaxScore = 50; 
         let currentRiskLevel = '';
         let currentUserName = ''; 
-        let currentEmail = '';
+        let currentEmail = ''; 
 
         window.heroSection = document.getElementById('hero-section');
         window.wizardSection = document.getElementById('wizard-section');
@@ -353,6 +343,9 @@
         window.phoneModal = document.getElementById('phone-modal');
         
         window.init = function() {
+            const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', dateOpts);
+            
             let factIdx = 0;
             factTicker.textContent = funFacts[0];
             setInterval(() => {
@@ -363,6 +356,8 @@
                     factTicker.style.opacity = 1;
                 }, 500);
             }, 6000);
+
+            safeLogEvent('screen_view', { screen_name: 'Inicio' });
         }
 
         window.toggleContactMenu = function() {
@@ -376,21 +371,13 @@
             nameModal.classList.remove('hidden');
             setTimeout(() => document.getElementById('user-name-input').focus(), 100);
         }
-
-        window.closeNameModal = function() {
-            nameModal.classList.add('hidden');
-        }
-
-        window.handleNameKeypress = function(e) {
-            if (e.key === 'Enter') submitNameAndStart();
-        }
+        window.closeNameModal = function() { nameModal.classList.add('hidden'); }
+        window.handleNameKeypress = function(e) { if (e.key === 'Enter') submitNameAndStart(); }
 
         window.submitNameAndStart = function() {
             const inputVal = document.getElementById('user-name-input').value.trim();
-            if (!inputVal) {
-                alert("Por favor, ingresa tu nombre para continuar.");
-                return;
-            }
+            if (!inputVal) return alert("Por favor, ingresa tu nombre para continuar.");
+            if (inputVal.length > 40) return alert("El nombre es demasiado largo.");
             currentUserName = inputVal;
             closeNameModal();
             startAssessment();
@@ -403,32 +390,24 @@
             currentStep = 0;
             answers = {};
             renderQuestion();
+            safeLogEvent('screen_view', { screen_name: 'Cuestionario' });
         }
 
         window.renderQuestion = function() {
             const q = activeQuestions[currentStep];
             stepNum.textContent = currentStep + 1;
             totalSteps.textContent = activeQuestions.length;
-            
-            const progressPct = ((currentStep) / activeQuestions.length) * 100;
-            progressBar.style.width = `${progressPct}%`;
+            progressBar.style.width = `${((currentStep) / activeQuestions.length) * 100}%`;
 
-            let html = `
-                <h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3>
-                <div class="mb-8"></div>
-                <div class="grid grid-cols-1 gap-3">
-            `;
-
+            let html = `<h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3><div class="mb-8"></div><div class="grid grid-cols-1 md:grid-cols-1 gap-3">`;
             q.options.forEach((opt, idx) => {
-                const valArg = opt.val;
                 const labelArg = opt.label.replace(/'/g, "\\'");
                 html += `
-                    <div onclick="selectAnswer('${q.id}', ${valArg}, '${labelArg}')" 
+                    <div onclick="selectAnswer('${q.id}', ${opt.val}, '${labelArg}')" 
                          class="cursor-pointer group relative bg-white border-2 border-slate-100 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg transition flex items-center h-full">
                         <div class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex flex-shrink-0 items-center justify-center font-bold mr-4 group-hover:bg-blue-100 group-hover:text-blue-600">${idx + 1}</div>
                         <span class="text-slate-700 font-medium group-hover:text-blue-700 text-left">${opt.label}</span>
-                    </div>
-                `;
+                    </div>`;
             });
             html += `</div>`;
 
@@ -437,10 +416,11 @@
 
         window.selectAnswer = function(qid, val, label) {
             answers[qid] = { value: val, label: label };
-            
+            safeLogEvent('question_answered', { question_id: qid, answer_value: val });
+
             if (currentStep < activeQuestions.length - 1) {
                 currentStep++;
-                renderQuestion();
+                setTimeout(renderQuestion, 200);
             } else {
                 finishAssessment();
             }
@@ -450,87 +430,67 @@
             wizardSection.classList.add('hidden');
             loadingSection.classList.remove('hidden');
             
+            document.getElementById('loading-fact').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+            
             setTimeout(() => {
                 calculateResults();
                 loadingSection.classList.add('hidden');
                 resultsSection.classList.remove('hidden');
+                safeLogEvent('screen_view', { screen_name: 'Resultados' });
             }, 3000);
         }
 
         window.calculateResults = function() {
             let totalPoints = 0;
-            const fixedMaxScore = 50; 
-            
             coreQuestions.forEach(q => {
-                const ans = answers[q.id];
-                if (ans && typeof ans.value === 'number') {
-                    totalPoints += ans.value;
-                }
+                if (answers[q.id]) totalPoints += answers[q.id].value;
             });
-
             currentCalculatedScore = totalPoints;
-            currentMaxScore = fixedMaxScore;
-            
             document.getElementById('display-user-name').textContent = currentUserName;
-
-            updateDashboard(totalPoints, fixedMaxScore);
+            updateDashboard(totalPoints, 50);
         }
 
         window.updateDashboard = function(score, maxScore) {
             document.getElementById('final-score').textContent = score;
             document.getElementById('max-possible-score').textContent = maxScore;
             
-            const percentage = score / maxScore; 
             const circle = document.getElementById('score-circle');
-            const circumference = 552; 
-            const offset = circumference - (percentage * circumference);
+            const offset = 552 - ((score / maxScore) * 552);
             setTimeout(() => { circle.style.strokeDashoffset = offset; }, 500);
 
             const badge = document.getElementById('score-badge');
             const desc = document.getElementById('score-description');
-            const pitchText = document.getElementById('pitch-text');
-            const circleColor = document.getElementById('score-circle');
+            const pitch = document.getElementById('pitch-text');
 
             if (score < 20) {
                 currentRiskLevel = 'Crítico';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700";
                 badge.textContent = "Nivel Crítico";
-                circleColor.classList.add('text-red-600');
-                circleColor.classList.remove('text-blue-600');
-                desc.textContent = "Su organización opera bajo un riesgo inminente. Se detectan brechas severas en los protocolos de recuperación.";
-                pitchText.textContent = "Su puntaje indica que un incidente menor podría convertirse en una crisis mayor.";
+                circle.classList.add('text-red-600'); circle.classList.remove('text-blue-600');
+                desc.textContent = "Su organización opera bajo un riesgo inminente.";
+                pitch.textContent = "Un incidente menor podría convertirse en una crisis mayor.";
             } else if (score <= 35) {
                 currentRiskLevel = 'En Desarrollo';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700";
                 badge.textContent = "En Desarrollo";
-                circleColor.classList.add('text-orange-500');
-                circleColor.classList.remove('text-blue-600');
-                desc.textContent = "Tiene las herramientas, pero faltan integración y pruebas. Su plan puede existir, pero la confianza en su ejecución es moderada.";
-                pitchText.textContent = "Está a mitad de camino. BCMEX se especializa en llevar empresas del 'papel a la práctica'.";
+                circle.classList.add('text-orange-500'); circle.classList.remove('text-blue-600');
+                desc.textContent = "Falta integración y pruebas en su plan.";
+                pitch.textContent = "BCMEX le ayuda a llevar su plan del papel a la práctica.";
             } else {
                 currentRiskLevel = 'Madurez Alta';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700";
                 badge.textContent = "Madurez Alta";
-                circleColor.classList.add('text-green-500');
-                circleColor.classList.remove('text-blue-600');
-                desc.textContent = "¡Excelente nivel de madurez! Su enfoque automatizado y proactivo lo pone por delante de la competencia.";
-                pitchText.textContent = "Incluso los mejores necesitan mantenerse afilados. BCMEX ofrece servicios de 'Threat Intelligence'.";
+                circle.classList.add('text-green-500'); circle.classList.remove('text-blue-600');
+                desc.textContent = "Excelente nivel de madurez y proactividad.";
+                pitch.textContent = "Manténgase afilado con los servicios de BCMEX.";
             }
         }
 
-        window.resetApp = function() {
-            location.reload();
-        }
+        window.resetApp = function() { location.reload(); }
 
         window.handleInlineSubmit = function() {
-            const emailInput = document.getElementById('inline-user-email');
-            const email = emailInput.value;
-            
-            if (!email || !email.includes('@')) {
-                alert('Por favor ingrese un correo válido.');
-                return;
-            }
-
+            const email = document.getElementById('inline-user-email').value;
+            if (!email || !email.includes('@')) return alert('Por favor ingrese un correo válido.');
             currentEmail = email;
             phoneModal.classList.remove('hidden');
             setTimeout(() => document.getElementById('user-phone-input').focus(), 100);
@@ -538,21 +498,15 @@
 
         window.submitWithPhone = function() {
             const phone = document.getElementById('user-phone-input').value.trim();
-            if (phone !== "" && !/^\d{10}$/.test(phone)) {
-                alert("Por favor, ingrese un valor en formato válido (p.ej: 8112345678)");
-                return; 
-            }
+            if (phone !== "" && !/^\d{10}$/.test(phone)) return alert("Use formato válido (p.ej: 8112345678)");
             finalSubmit(phone);
         }
 
-        window.submitWithoutPhone = function() {
-            finalSubmit(""); 
-        }
+        window.submitWithoutPhone = function() { finalSubmit(""); }
 
-        // --- LA FUNCIÓN DE GUARDADO QUE CONECTA CON VERCEL ---
+        // --- CONEXIÓN DIRECTA Y SEGURA A LA API DE VERCEL ---
         window.finalSubmit = async function(phoneNumber) {
-            phoneModal.classList.add('hidden'); 
-            
+            phoneModal.classList.add('hidden');
             const btn = document.getElementById('btn-inline-submit');
             const originalText = btn.innerHTML;
             btn.innerHTML = `<span class="animate-spin material-symbols-outlined">progress_activity</span> Enviando...`;
@@ -568,26 +522,24 @@
             };
 
             try {
-                // Hacemos la petición POST a tu propia API en Vercel
+                // Fetch al backend seguro que acabamos de crear en Vercel
                 const response = await fetch('/api/guardar-lead', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json',
-                                'Version': 'gX9#mK2$pL7qRt4vNw'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
-                    alert("¡Se han capturado sus datos de manera exitosa! En breve le enviaremos los detalles completos a su correo.");
-                    document.getElementById('inline-user-email').value = '';
+                    safeLogEvent('lead_generated', { score: currentCalculatedScore, risk_level: currentRiskLevel });
+                    alert("¡Éxito! Sus resultados han sido analizados por la IA y enviados a su correo.");
                     resetApp();
                 } else {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || 'Error desconocido en el servidor');
+                    throw new Error(errorData.error || 'Error del servidor');
                 }
-
             } catch (error) {
-                console.error("Error al hacer fetch al backend:", error);
-                alert("Hubo un problema al enviar los datos. Reintenta más tarde.");
+                console.error("Fetch error:", error);
+                alert("Hubo un error al procesar la solicitud: " + error.message);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -596,4 +548,5 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
-</body></html>
+</body>
+</html>
