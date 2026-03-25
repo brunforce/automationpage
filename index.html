@@ -192,11 +192,9 @@
     <button class="text-slate-400 hover:text-red-500 transition flex items-center justify-center" onclick="resetApp()" title="Salir del diagnóstico">
         <span class="material-symbols-outlined">close</span>
     </button>
-    <!-- Botón Volver -->
-    <button id="btn-back" class="hidden text-slate-400 hover:text-blue-600 transition flex items-center text-sm font-medium border-l border-slate-200 pl-4 ml-1" onclick="goBack()" title="Regresar a la pregunta anterior">
-        <span class="material-symbols-outlined text-lg mr-1">arrow_back</span> Volver
-    </button>
-    <div class="ml-4">
+    
+    <!-- Contador de progreso -->
+    <div class="border-l border-slate-200 pl-4 ml-1">
         <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Pregunta <span id="current-step-num">1</span> de <span id="total-steps">15</span></span>
         <div class="h-1.5 w-32 md:w-48 bg-slate-100 rounded-full mt-1 overflow-hidden">
             <div class="h-full bg-blue-600 transition-all duration-500 w-0" id="progress-bar"></div>
@@ -462,12 +460,21 @@
             totalSteps.textContent = activeQuestions.length;
             progressBar.style.width = `${((currentStep) / activeQuestions.length) * 100}%`;
 
-            // Mostrar u ocultar el botón de "Volver"
-            document.getElementById('btn-back').classList.toggle('hidden', currentStep === 0);
-
             const savedAnswer = answers[q.id]; // Revisamos si ya había contestado esto antes
 
-            let html = `<h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3><div class="mb-8"></div><div class="grid grid-cols-1 gap-3">`;
+            let html = '';
+            
+            // Botón de volver dentro de la tarjeta blanca
+            if (currentStep > 0) {
+                html += `
+                <div class="mb-6">
+                    <button onclick="goBack()" class="text-slate-400 hover:text-blue-600 transition flex items-center text-sm font-medium">
+                        <span class="material-symbols-outlined text-lg mr-1">arrow_back</span> Volver a la pregunta anterior
+                    </button>
+                </div>`;
+            }
+
+            html += `<h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3><div class="mb-8"></div><div class="grid grid-cols-1 gap-3">`;
             q.options.forEach((opt, idx) => {
                 const labelArg = opt.label.replace(/'/g, "\\'");
                 
