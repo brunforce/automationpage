@@ -300,7 +300,7 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Acceso denegado. Origen no permitido.' });
   }
 
-  res.setHeader('Access-                           Control-Allow-Origin', origin || ALLOWED_ORIGINS[0]);
+  res.setHeader('Access-Control-Allow-Origin', origin || ALLOWED_ORIGINS[0]);
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });
