@@ -12,9 +12,9 @@ const ALLOWED_ORIGINS = [
   'https://bcpscore2.vercel.app'
 ];
 
-const VALID_LEVELS = ['Crítico', 'En Desarrollo', 'Madurez Alta']; // Ajusta a tus valores reales
-const MAX_ANSWERS = 30;       // Máximo de preguntas esperadas en el formulario
-const MAX_LABEL_LENGTH = 300; // Máximo de caracteres por respuesta
+const VALID_LEVELS = ['Crítico', 'En Desarrollo', 'Madurez Alta'];
+const MAX_ANSWERS = 30;
+const MAX_LABEL_LENGTH = 300;
 const SCORE_MIN = 0;
 const SCORE_MAX = 50;
 
@@ -22,10 +22,6 @@ const SCORE_MAX = 50;
 // HELPERS DE SEGURIDAD
 // ==========================================
 
-/**
- * Escapa caracteres HTML peligrosos para evitar XSS en los correos.
- * Se aplica a cualquier dato del usuario que se inserte en HTML.
- */
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str
@@ -35,71 +31,13 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;');
 }
-
-/**
- * Sanitiza texto plano para insertarlo en un prompt de IA.
- * Elimina caracteres que permiten inyectar instrucciones (prompt injection).
- * Conserva letras, números, espacios y puntuación básica.
- */
-function sanitizeForPrompt(str, maxLength = 200) {
-  if (typeof str !== 'string') return '';
-  return str
-    .replace(/[\[\]{}<>]/g, '')   // Elimina corchetes y angulares usados en injection
-    .replace(/ignore|olvida|system|instrucción|instruction|jailbreak/gi, '') // Palabras clave de injection
-    .trim()
-    .substring(0, maxLength);
-}
-
-/**
- * Valida formato básico de email con regex más estricto que solo includes('@').
- */
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  return emailRegex.test(email) && email.length <= 100;
-}
-
-/**
- * Valida y sanitiza el objeto answers. Aplica límites estrictos de estructura.
- */
-function sanitizeAnswers(rawAnswers) {
-  if (typeof rawAnswers !== 'object' || Array.isArray(rawAnswers) || rawAnswers === null) {
-    return {};
-  }
-
-  const keys = Object.keys(rawAnswers);
-
-  // Limitar número de respuestas
-  if (keys.length > MAX_ANSWERS) {
-    throw new Error(`Número de respuestas excede el límite permitido (${MAX_ANSWERS})`);
-  }
-
-  const clean = {};
-  for (const key of keys) {
-    // Validar que la key sea alfanumérica con guión bajo (ej: q1_pregunta)
-    if (!/^[a-zA-Z0-9_]{1,50}$/.test(key)) continue;
-
-    const answerObj = rawAnswers[key];
-
-    // Solo aceptar objetos con value y label, sin anidamiento profundo
-    if (typeof answerObj !== 'object' || Array.isArray(answerObj) || answerObj === null) continue;
-
-    const value = answerObj.value;
-    const label = answerObj.label;
-
-    if (typeof label !== 'string' || label.length > MAX_LABEL_LENGTH) continue;
-    if (typeof value !== 'string' && typeof value !== 'number') continue;
-
-    clean[key] = {
-      value: typeof value === 'number' ? value : String(value).substring(0, 50),
-      label: label.trim().substring(0, MAX_LABEL_LENGTH)
-    };
-  }
-
-  return clean;
-}
+                                                                                                                                                                                               
+const     ipCache = new Map();
+const RATE_LIMIT_WINDOW_MS = 120 * 1000;
+const MAX_REQUESTS = 1;
 
 // ==========================================
-// FUNCIÓN AUXILIAR: PROCESAMIENTO IA Y POSTMARK
+// FUNCIÓN AUXILIAR: PROCESAMIENTO IA Y POSTMARK (1 SOLO CORREO)
 // ==========================================
 async function procesarIAyCorreo(data, dbKey) {
   try {
@@ -112,43 +50,32 @@ async function procesarIAyCorreo(data, dbKey) {
     }
     let promptText = fs.readFileSync(promptPath, 'utf8');
 
-    // 2. Reemplazar variables en el prompt con valores sanitizados (anti prompt injection)
-    promptText = promptText.replace(/{{Nombre del Cliente}}/g, sanitizeForPrompt(data.name, 80));
-    promptText = promptText.replace(/{{Puntaje}}/g, String(data.score));
-    promptText = promptText.replace(/{{Nivel de Riesgo}}/g, sanitizeForPrompt(data.level, 50));
+    // 2. Reemplazar variables en el prompt
+    promptText = promptText.replace(/{{Nombre del Cliente}}/g, data.name || 'Cliente');
+    promptText = promptText.replace(/{{Puntaje}}/g, String(data.score || 0));
+    promptText = promptText.replace(/{{Nivel de Riesgo}}/g, data.level || 'Desconocido');
 
     const respuestas = data.answers || {};
     for (const [key, answerObj] of Object.entries(respuestas)) {
       const shortId = key.split('_')[0].toUpperCase();
-      // sanitizeForPrompt también aplicado al label de cada respuesta
-      const label = typeof answerObj === 'object'
-        ? sanitizeForPrompt(answerObj.label, MAX_LABEL_LENGTH)
-        : sanitizeForPrompt(String(answerObj), MAX_LABEL_LENGTH);
+      const label = typeof answerObj === 'object' ? answerObj.label : String(answerObj);
       const regex = new RegExp(`{{Respuesta ${shortId}}}`, 'g');
       promptText = promptText.replace(regex, label);
     }
 
     // 3. Consultar a Gemini
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); 
     const result = await model.generateContent(promptText);
-    const textoCrudo = result.response.text();
+    
+    // Obtenemos el texto crudo tal cual lo devuelve la IA
+    const analisisCrudo = result.response.text().trim();
 
-    // 4. Extraer los bloques usando Regex
-    const matchEmail = textoCrudo.match(/\[EMAIL_CLIENTE_START\]([\s\S]*?)\[EMAIL_CLIENTE_END\]/i);
-    const matchInterno = textoCrudo.match(/\[ANALISIS_INTERNO_START\]([\s\S]*?)\[ANALISIS_INTERNO_END\]/i);
-
-    if (!matchEmail || !matchInterno) {
-      throw new Error("Gemini no devolvió las etiquetas correctamente.");
+    if (!analisisCrudo) {
+      throw new Error("Gemini devolvió una respuesta vacía.");
     }
 
-    // El contenido de Gemini va directo al HTML del correo: sanitizar contra XSS
-    // Nota: correoCliente proviene de Gemini (confiable), pero sanitizamos por si
-    // el modelo repitió verbatim datos del usuario con HTML malicioso.
-    const correoCliente = escapeHtml(matchEmail[1].trim());
-    const analisisInterno = escapeHtml(matchInterno[1].trim());
-
-    // 5. Enviar por Postmark — datos del usuario escapados antes de insertar en HTML
+    // 4. Enviar un ÚNICO correo por Postmark (al equipo interno)
     const postmarkUrl = "https://api.postmarkapp.com/email";
     const headers = {
       "Accept": "application/json",
@@ -156,12 +83,20 @@ async function procesarIAyCorreo(data, dbKey) {
       "X-Postmark-Server-Token": process.env.POSTMARK_TOKEN
     };
 
-    const safeName  = escapeHtml(data.name);
+    // Escapar datos del usuario para el HTML del correo (seguridad)
+    const safeName = escapeHtml(data.name);
     const safeEmail = escapeHtml(data.email);
     const safePhone = escapeHtml(data.phone);
 
-    // Correo Cliente
-    const htmlCliente = `<!DOCTYPE html>
+    // Formatear el texto crudo para HTML (cambiar saltos de línea por <br>)
+    const analisisFormateado = escapeHtml(analisisCrudo).replace(/\n/g, '<br>');
+
+    // Construcción del Payload con la plantilla de diseño original integrada
+    const payloadInterno = {
+      From: process.env.POSTMARK_FROM_EMAIL,
+      To: process.env.POSTMARK_INTERNAL_EMAIL,
+      Subject: `🔥 NUEVO LEAD BCP: ${safeName}`,
+      HtmlBody: `
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="UTF-8">
@@ -173,7 +108,7 @@ async function procesarIAyCorreo(data, dbKey) {
 <tr><td align="center">
 <table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
 
-  <!-- HEADER - VML gradient para Outlook, CSS gradient para el resto -->
+  <!-- HEADER -->
   <tr>
     <td bgcolor="#1a3a6e" style="padding:0;background:#1a3a6e;">
       <!--[if gte mso 9]>
@@ -188,14 +123,14 @@ async function procesarIAyCorreo(data, dbKey) {
             <table cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 20px;">
               <tr>
                 <td align="center" bgcolor="#1e4d9b" style="background:#1e4d9b;border:1px solid #3b6bbf;padding:6px 20px;">
-                  <span style="font-size:10px;color:#bfdbfe;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Confidencial</span>
+                  <span style="font-size:10px;color:#bfdbfe;letter-spacing:3px;text-transform:uppercase;font-weight:600;">Informe Interno (Nuevo Lead)</span>
                 </td>
               </tr>
             </table>
             <h1 style="margin:0 0 10px;font-size:28px;font-weight:300;color:#ffffff;letter-spacing:0.5px;line-height:36px;mso-line-height-rule:exactly;">
-              Diagn&#243;stico de<br><strong style="font-weight:700;">Resiliencia Empresarial</strong>
+              Diagnóstico de<br><strong style="font-weight:700;">Resiliencia Empresarial</strong>
             </h1>
-            <p style="margin:0;font-size:12px;color:#bfdbfe;letter-spacing:2.5px;text-transform:uppercase;">Plan de Continuidad de Negocio</p>
+            <p style="margin:0;font-size:12px;color:#bfdbfe;letter-spacing:2.5px;text-transform:uppercase;">Puntaje: ${data.score} / 50 (${data.level})</p>
             <table width="80" cellpadding="0" cellspacing="0" align="center" style="margin:28px auto 0;">
               <tr><td height="1" bgcolor="#5b8dd9" style="font-size:0;line-height:0;">&nbsp;</td></tr>
             </table>
@@ -209,12 +144,22 @@ async function procesarIAyCorreo(data, dbKey) {
   <!-- CUERPO BLANCO -->
   <tr>
     <td bgcolor="#ffffff" style="background:#ffffff;padding:36px 52px 24px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
-      <p style="margin:0 0 6px;font-size:13px;color:#4a7cb5;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Preparado para</p>
+      <p style="margin:0 0 6px;font-size:13px;color:#4a7cb5;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Datos del Prospecto</p>
       <p style="margin:0 0 20px;font-size:22px;font-weight:700;color:#0a1628;">${safeName}</p>
+      
+      <!-- INYECCIÓN DE DATOS DE CONTACTO -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px; border:1px solid #e2e8f0; border-radius: 4px; background:#f8fafc;">
+        <tr>
+          <td style="padding:12px 15px; border-bottom:1px solid #e2e8f0; font-size:14px; color:#334155;"><strong>Email:</strong> <a href="mailto:${safeEmail}" style="color:#1a3a6e; text-decoration:none;">${safeEmail}</a></td>
+        </tr>
+        <tr>
+          <td style="padding:12px 15px; font-size:14px; color:#334155;"><strong>Teléfono:</strong> ${safePhone}</td>
+        </tr>
+      </table>
+
       <p style="margin:0;font-size:14px;color:#334155;line-height:1.85;">
-        Hemos concluido el an&#225;lisis de resiliencia de su organizaci&#243;n.
-        A continuaci&#243;n encontrar&#225; los resultados detallados y las recomendaciones
-        de nuestro equipo especializado en continuidad de negocio.
+        Se ha concluido el análisis de resiliencia de esta organización.
+        A continuación encontrará los resultados crudos generados por el modelo de Inteligencia Artificial para uso interno.
       </p>
     </td>
   </tr>
@@ -226,7 +171,7 @@ async function procesarIAyCorreo(data, dbKey) {
         <tr>
           <td width="70" height="1" bgcolor="#bdd7f5" style="font-size:0;line-height:0;">&nbsp;</td>
           <td align="center" style="padding:0 12px;">
-            <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#4a7cb5;font-weight:600;">&#9670;&nbsp; Resultados del An&#225;lisis &nbsp;&#9670;</span>
+            <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#4a7cb5;font-weight:600;">&#9670;&nbsp; Análisis de IA &nbsp;&#9670;</span>
           </td>
           <td width="70" height="1" bgcolor="#bdd7f5" style="font-size:0;line-height:0;">&nbsp;</td>
         </tr>
@@ -240,8 +185,8 @@ async function procesarIAyCorreo(data, dbKey) {
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td bgcolor="#f5f9ff" style="background:#f5f9ff;border-left:5px solid #1a3a6e;padding:28px 30px;">
-            <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1a3a6e;font-weight:600;">&#128203; An&#225;lisis de Resultados</p>
-            <p style="margin:0;font-size:14px;color:#0a1628;line-height:28px;mso-line-height-rule:exactly;">${correoCliente.replace(/\n/g, '<br>')}</p>
+            <p style="margin:0 0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1a3a6e;font-weight:600;">&#128203; REPORTE GENERADO</p>
+            <div style="margin:0;font-size:14px;color:#0a1628;line-height:28px;mso-line-height-rule:exactly;white-space:pre-wrap;">${analisisFormateado}</div>
           </td>
         </tr>
       </table>
@@ -261,12 +206,12 @@ async function procesarIAyCorreo(data, dbKey) {
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td align="center" bgcolor="#e8f0fd" style="background:#e8f0fd;border:1px solid #bdd7f5;padding:28px 32px;">
-            <p style="margin:0 0 6px;font-size:17px;font-weight:700;color:#0a1628;">&#191;Listo para el siguiente paso?</p>
-            <p style="margin:0 0 22px;font-size:13px;color:#334155;line-height:1.7;">Nuestro equipo de especialistas est&#225; disponible para<br>acompa&#241;arle en cada etapa del proceso.</p>
+            <p style="margin:0 0 6px;font-size:17px;font-weight:700;color:#0a1628;">El reporte ha sido procesado</p>
+            <p style="margin:0 0 22px;font-size:13px;color:#334155;line-height:1.7;">Este correo es de uso exclusivamente interno.<br>No ha sido enviado al cliente.</p>
             <table cellpadding="0" cellspacing="0" align="center">
               <tr>
                 <td align="center" bgcolor="#1a3a6e" style="background:#1a3a6e;padding:14px 40px;">
-                  <a href="https://bcmex.mx" style="color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Visitar BCMEX.mx &nbsp;&#8594;</a>
+                  <a href="https://bcmex.mx" style="color:#ffffff;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Ir al portal &nbsp;&#8594;</a>
                 </td>
               </tr>
             </table>
@@ -276,7 +221,7 @@ async function procesarIAyCorreo(data, dbKey) {
     </td>
   </tr>
 
-  <!-- FOOTER - VML para Outlook -->
+  <!-- FOOTER -->
   <tr>
     <td bgcolor="#0f2348" style="padding:0;background:#0f2348;">
       <!--[if gte mso 9]>
@@ -293,7 +238,7 @@ async function procesarIAyCorreo(data, dbKey) {
               <tr><td height="1" bgcolor="#2d5a9e" style="font-size:0;line-height:0;">&nbsp;</td></tr>
             </table>
             <p style="margin:0;font-size:11px;color:#6b8cba;line-height:18px;mso-line-height-rule:exactly;">
-              Este correo es confidencial y est&#225; dirigido exclusivamente a su destinatario.<br>
+              Este correo es confidencial y est&#225; dirigido exclusivamente al equipo interno.<br>
               <a href="https://bcmex.mx" style="color:#8fb8e8;text-decoration:none;">www.bcmex.mx</a>
             </p>
           </td>
@@ -308,126 +253,24 @@ async function procesarIAyCorreo(data, dbKey) {
 </td></tr>
 </table>
 </body>
-</html>`;
-
-    const payloadCliente = {
-      From: process.env.POSTMARK_FROM_EMAIL,
-      To: data.email,
-      Subject: "Diagnóstico de Resiliencia BCP - Resultados BCMEX",
-      HtmlBody: htmlCliente
+</html>
+      `
     };
 
-    // Correo Interno
-    const htmlInterno = `<!DOCTYPE html>
-<html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-<head>
-<meta charset="UTF-8">
-<!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
-</head>
-<body style="margin:0;padding:0;background:#0d1117;font-family:'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#0d1117" style="background:#0d1117;padding:30px 0;">
-<tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+    console.log(`[Postmark] Enviando análisis crudo al equipo...`);
+    const pmResponse = await fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadInterno) });
+    
+    if (!pmResponse.ok) {
+        console.error("Error en Postmark:", await pmResponse.text());
+    }
 
-  <!-- Barra superior amber/roja: sólido para Outlook -->
-  <tr>
-    <td bgcolor="#f59e0b" height="3" style="font-size:0;line-height:0;background:#f59e0b;">
-      <!--[if !mso]><!-->
-      <div style="background:linear-gradient(90deg,#f59e0b,#ef4444);height:3px;font-size:0;line-height:0;"></div>
-      <!--<![endif]-->
-    </td>
-  </tr>
-
-  <!-- HEADER oscuro - VML para Outlook -->
-  <tr>
-    <td bgcolor="#1a1a2e" style="padding:0;background:#1a1a2e;">
-      <!--[if gte mso 9]>
-      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;">
-        <v:fill type="gradient" color="#1a1a2e" color2="#16213e" angle="135" focus="100%"/>
-        <v:textbox inset="0,0,0,0" style="mso-fit-shape-to-text:true">
-      <![endif]-->
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td align="center" bgcolor="#1a1a2e" style="padding:28px 36px;background:linear-gradient(135deg,#1a1a2e,#16213e);">
-            <p style="margin:0 0 6px;font-size:10px;letter-spacing:4px;color:#fbbf24;text-transform:uppercase;">&#128293; Nuevo Lead Detectado</p>
-            <h2 style="margin:0 0 6px;font-size:20px;font-weight:600;color:#f0f6ff;line-height:28px;mso-line-height-rule:exactly;">${safeName}</h2>
-            <p style="margin:0;font-size:12px;color:#7fb3e8;">${safeEmail}</p>
-          </td>
-        </tr>
-      </table>
-      <!--[if gte mso 9]></v:textbox></v:rect><![endif]-->
-    </td>
-  </tr>
-
-  <!-- Teléfono -->
-  <tr>
-    <td bgcolor="#111827" style="background:#111827;padding:24px 36px 8px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td bgcolor="#0f172a" style="background:#0f172a;border:1px solid #1e293b;padding:8px 12px;">
-            <span style="font-size:11px;color:#64748b;">Tel&#233;fono</span><br>
-            <span style="font-size:13px;color:#e2e8f0;font-weight:500;">${safePhone}</span>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <!-- Análisis interno -->
-  <tr>
-    <td bgcolor="#111827" style="background:#111827;padding:16px 36px 32px;border-left:1px solid #1e293b;border-right:1px solid #1e293b;">
-      <p style="margin:0 0 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#f59e0b;font-weight:600;">&#128202; An&#225;lisis Interno &middot; Equipo BCMEX</p>
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td bgcolor="#0f172a" style="background:#0f172a;border-left:4px solid #f59e0b;padding:20px 22px;">
-            <p style="margin:0;font-size:13px;color:#cbd5e1;line-height:24px;mso-line-height-rule:exactly;">${analisisInterno.replace(/\n/g, '<br>')}</p>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <!-- Footer interno -->
-  <tr>
-    <td bgcolor="#0a0f1a" style="background:#0a0f1a;border-top:1px solid #1e293b;border-left:1px solid #1e293b;border-right:1px solid #1e293b;padding:16px 36px;text-align:center;">
-      <p style="margin:0;font-size:11px;color:#4a5568;">Notificaci&#243;n interna BCMEX &nbsp;&#183;&nbsp; No responder a este correo</p>
-    </td>
-  </tr>
-
-  <!-- Barra inferior: sólido para Outlook -->
-  <tr>
-    <td bgcolor="#ef4444" height="3" style="font-size:0;line-height:0;background:#ef4444;">
-      <!--[if !mso]><!-->
-      <div style="background:linear-gradient(90deg,#ef4444,#f59e0b);height:3px;font-size:0;line-height:0;"></div>
-      <!--<![endif]-->
-    </td>
-  </tr>
-
-</table>
-</td></tr>
-</table>
-</body>
-</html>`;
-
-    const payloadInterno = {
-      From: process.env.POSTMARK_FROM_EMAIL,
-      To: process.env.POSTMARK_INTERNAL_EMAIL,
-      Subject: `🔥 NUEVO LEAD BCP: ${safeName}`,
-      HtmlBody: htmlInterno
-    };
-
-    console.log(`[Postmark] Enviando correos...`);
-    await fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadCliente) });
-    await fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadInterno) });
-
-    // 6. Actualizar Firebase marcando como procesado
+    // 5. Actualizar Firebase
     const db = admin.database();
     await db.ref(`respuestas_bcmex/${dbKey}`).update({ procesado: true });
     console.log(`[Procesador] Lead ${dbKey} finalizado exitosamente.`);
 
   } catch (error) {
     console.error("[Procesador] Error en la IA o Postmark:", error);
-    // Aunque falle el correo, no tumbamos la petición para no asustar al usuario.
   }
 }
 
@@ -435,114 +278,72 @@ async function procesarIAyCorreo(data, dbKey) {
 // FUNCIÓN PRINCIPAL DEL SERVIDOR (HANDLER)
 // ==========================================
 export default async function handler(req, res) {
-
-
-  // ------------------------------------------
-  // 1. LÍMITE DE TAMAÑO DE PAYLOAD
-  // ------------------------------------------
+  // 1. LIMITACIÓN DE TAMAÑO INICIAL (Evita que intenten saturar la RAM antes de procesar)
   const payloadString = JSON.stringify(req.body || {});
-  if (Buffer.byteLength(payloadString, 'utf8') > 20000) { // Reducido de 50KB a 20KB
+  if (Buffer.byteLength(payloadString, 'utf8') > 50000) {
+    console.warn('[SEGURIDAD] Intento de inyección de payload gigante bloqueado.');
     return res.status(413).json({ error: 'Payload Too Large' });
   }
 
-  // ------------------------------------------
-  // 2. CORS — bloquear si no hay origin O si no está en la lista
-  //    (antes pasaba si origin era undefined)
-  // ------------------------------------------
+  // 2. CORS (Bloqueo de orígenes no autorizados)
   const origin = req.headers.origin;
-  if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
-    return res.status(403).json({ error: 'Acceso denegado' });
+  
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]);
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, version');
+    return res.status(200).end();
   }
 
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Api-Secret');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
-
-  // ------------------------------------------
-  // 3. SECRET TOKEN — segunda capa de autenticación
-  //    Tu frontend debe enviar este header en cada POST.
-  //    Agrégalo en tus env vars de Vercel como API_SECRET.
-  // ------------------------------------------
-  const apiSecret = req.headers['version'];
-  if (!apiSecret || apiSecret !== process.env.API_SECRET) {
-    return res.status(403).json({ error: 'No autorizado' });
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    console.warn(`[CORS] Intento bloqueado desde: ${origin}`);
+    return res.status(403).json({ error: 'Acceso denegado. Origen no permitido.' });
   }
 
-  // ------------------------------------------
-  // 4. RATE LIMIT POR EMAIL (no por IP — IP es spoofeable)
-  //    Nota: este rate limit en memoria es de respaldo.
-  //    Para producción real, migrar a Upstash Redis.
-  //    Ver: https://upstash.com/docs/redis/sdks/ratelimit-ts/overview
-  // ------------------------------------------
-  const bodyForRateLimit = req.body || {};
-  const emailKey = typeof bodyForRateLimit.email === 'string'
-    ? bodyForRateLimit.email.toLowerCase().trim()
-    : null;
+  res.setHeader('Access-                           Control-Allow-Origin', origin || ALLOWED_ORIGINS[0]);
 
-  // Rate limit secundario por IP (con cabecera de Vercel, más confiable que x-forwarded-for del cliente)
-  // x-vercel-forwarded-for es seteado por la infraestructura de Vercel, no por el cliente
-  const clientIp = req.headers['x-vercel-forwarded-for'] || 'ip-desconocida';
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método no permitido' });
+  }
+
+  // 3. AUTENTICACIÓN ESTRICTA DE API
+  const clientToken = req.headers['version'];
+  if (!clientToken || clientToken !== process.env.API_SECRET) {
+    console.warn(`[AUTH] Intento de acceso sin token válido.`);
+    return res.status(401).json({ error: 'No autorizado. Token inválido o ausente.' });
+  }
+
+  // 4. RATE LIMITING POR IP
+  const rawForwarded = req.headers['x-forwarded-for'] || '';
+  const clientIp = req.headers['x-real-ip'] || rawForwarded.split(',')[0].trim() || req.socket.remoteAddress || 'ip-desconocida';
   const currentTime = Date.now();
 
-  // Función interna para evaluar y registrar en el caché
-  function checkRateLimit(cacheKey) {
-    if (!cacheKey) return false; // Sin clave, dejar pasar (se validará abajo)
-    if (ipCache.has(cacheKey)) {
-      const rateData = ipCache.get(cacheKey);
-      if (currentTime - rateData.startTime < RATE_LIMIT_WINDOW_MS) {
-        if (rateData.count >= MAX_REQUESTS) return true; // Bloqueado
-        rateData.count++;
-      } else {
-        ipCache.set(cacheKey, { count: 1, startTime: currentTime });
+  if (ipCache.has(clientIp)) {
+    const rateData = ipCache.get(clientIp);
+    if (currentTime - rateData.startTime < RATE_LIMIT_WINDOW_MS) {
+      if (rateData.count >= MAX_REQUESTS) {
+        console.warn(`[RATE LIMIT] IP bloqueada temporalmente: ${clientIp}`);
+        return res.status(429).json({ error: 'Demasiadas solicitudes. Por favor, espera 2 minutos.' });
       }
+      rateData.count++;
     } else {
-      ipCache.set(cacheKey, { count: 1, startTime: currentTime });
+      ipCache.set(clientIp, { count: 1, startTime: currentTime });
     }
-    return false;
+  } else {
+    ipCache.set(clientIp, { count: 1, startTime: currentTime });
   }
 
-  if (checkRateLimit(clientIp) || checkRateLimit(emailKey)) {
-    return res.status(429).json({ error: 'Demasiadas solicitudes. Intenta más tarde.' });
-  }
+  if (ipCache.size > 1000) ipCache.clear();
 
-  // Limpiar entradas expiradas en lugar de borrar todo el caché de golpe
-  if (ipCache.size > 1000) {
-    for (const [key, val] of ipCache.entries()) {
-      if (currentTime - val.startTime >= RATE_LIMIT_WINDOW_MS) {
-        ipCache.delete(key);
-      }
-    }
-    // Si aún hay más de 1000 tras limpiar expirados, eliminar los más antiguos
-    if (ipCache.size > 1000) {
-      const oldest = [...ipCache.entries()].sort((a, b) => a[1].startTime - b[1].startTime);
-      oldest.slice(0, 200).forEach(([k]) => ipCache.delete(k));
-    }
-  }
-
-  // ------------------------------------------
-  // 5. VERIFICAR ENV VARS CRÍTICAS
-  // ------------------------------------------
+  // 5. VALIDACIÓN DE VARIABLES DE ENTORNO EN SERVIDOR
   const dbUrl = process.env.FIREBASE_DATABASE_URL;
-  if (
-    !dbUrl ||
-    !process.env.FIREBASE_PRIVATE_KEY ||
-    !process.env.GEMINI_API_KEY ||
-    !process.env.POSTMARK_TOKEN ||
-    !process.env.API_SECRET
-  ) {
-    console.error('[Config] Faltan variables de entorno críticas');
-    return res.status(500).json({ error: 'Configuración de servidor incompleta' });
+  if (!dbUrl || !process.env.FIREBASE_PRIVATE_KEY || !process.env.API_SECRET) {
+    console.error('CRÍTICO: Faltan variables de entorno en Vercel.');
+    return res.status(500).json({ error: 'Error de configuración interna del servidor.' });
   }
 
   try {
-    // ------------------------------------------
-    // 6. INICIALIZAR FIREBASE (una sola vez)
-    // ------------------------------------------
+    // 6. INICIALIZAR FIREBASE ADMIN
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert({
@@ -557,80 +358,66 @@ export default async function handler(req, res) {
     const db = admin.database();
     const data = req.body;
 
-
-    // ------------------------------------------
-    // 7. VALIDACIONES DE CAMPOS
-    // ------------------------------------------
-
-    // Email
-    if (!data.email || !isValidEmail(data.email)) {
+    // 7. VALIDACIÓN ESTRICTA Y SANITIZACIÓN (DATA VALIDATION)
+    if (!data.email || typeof data.email !== 'string' || !data.email.includes('@') || data.email.length > 100) {
       return res.status(400).json({ error: 'Correo electrónico inválido' });
     }
-
-    // Nombre
+    
     if (!data.name || typeof data.name !== 'string' || data.name.trim() === '' || data.name.length > 80) {
       return res.status(400).json({ error: 'Nombre inválido' });
     }
 
-    // Score — validación de rango estricta
-    const cleanScore = typeof data.score === 'number' ? data.score : parseInt(data.score, 10);
-    if (isNaN(cleanScore) || cleanScore < SCORE_MIN || cleanScore > SCORE_MAX) {
-      return res.status(400).json({ error: `Score debe estar entre ${SCORE_MIN} y ${SCORE_MAX}` });
+    if (data.phone && data.phone !== "No proporcionado") {
+        if (!/^[0-9]{10}$/.test(data.phone)) {
+            return res.status(400).json({ error: 'El teléfono debe tener exactamente 10 dígitos numéricos.' });
+        }
     }
 
-    // Level — solo valores del enum permitido
-    if (!data.level || !VALID_LEVELS.includes(data.level)) {
-      return res.status(400).json({ error: 'Nivel de riesgo inválido' });
+    const rawScore = typeof data.score === 'number' ? data.score : parseInt(data.score, 10);
+    if (isNaN(rawScore) || rawScore < SCORE_MIN || rawScore > SCORE_MAX) {
+      return res.status(400).json({ error: 'Puntaje inválido o fuera de rango.' });
     }
 
-    // Phone — vacío o exactamente 10 dígitos
-    const rawPhone = typeof data.phone === 'string' ? data.phone.trim() : '';
-    const phoneToSave = (rawPhone === '' || rawPhone === 'No proporcionado') 
-      ? 'No proporcionado' 
-      : rawPhone;
-    
-    if (phoneToSave !== 'No proporcionado' && !/^[0-9]{10}$/.test(phoneToSave)) {
-      return res.status(400).json({ error: 'Teléfono inválido' });
+    if (!VALID_LEVELS.includes(data.level)) {
+        console.warn(`Nivel de riesgo no estándar recibido: ${data.level}`);
     }
 
-    // Answers — validación y sanitización profunda
-    let cleanAnswers;
-    try {
-      cleanAnswers = sanitizeAnswers(data.answers);
-    } catch (e) {
-      return res.status(400).json({ error: e.message });
+    let cleanAnswers = {};
+    if (data.answers && typeof data.answers === 'object') {
+        const keys = Object.keys(data.answers).slice(0, MAX_ANSWERS);
+        for (const key of keys) {
+            const rawLabel = data.answers[key]?.label || "Sin respuesta";
+            const rawValue = data.answers[key]?.value || 0;
+            
+            cleanAnswers[key] = {
+                value: typeof rawValue === 'number' ? rawValue : 0,
+                label: escapeHtml(String(rawLabel).substring(0, MAX_LABEL_LENGTH))
+            };
+        }
     }
 
-    // ------------------------------------------
     // 8. CONSTRUIR OBJETO LIMPIO PARA FIREBASE
-    // ------------------------------------------
     const cleanData = {
-      name:      data.name.trim().substring(0, 80),
-      email:     data.email.trim().toLowerCase().substring(0, 100),
-      phone:     phoneToSave,
-      level:     data.level,
-      score:     cleanScore,
+      name:      escapeHtml(data.name.trim()),
+      email:     escapeHtml(data.email.trim().toLowerCase()),
+      phone:     escapeHtml(data.phone.trim()),
+      level:     escapeHtml(data.level),
+      score:     rawScore,
       answers:   cleanAnswers,
       timestamp: admin.database.ServerValue.TIMESTAMP,
       source:    'Vercel-API-Secure',
       procesado: false
     };
 
-    // ------------------------------------------
     // 9. GUARDAR EN FIREBASE
-    // ------------------------------------------
     const newLeadRef = db.ref('respuestas_bcmex').push();
     const pushId = newLeadRef.key;
     await newLeadRef.set(cleanData);
 
-    // ------------------------------------------
     // 10. PROCESAR IA Y ENVIAR CORREOS
-    // ------------------------------------------
     await procesarIAyCorreo(cleanData, pushId);
 
-    // ------------------------------------------
     // 11. RESPONDER ÉXITO AL CLIENTE
-    // ------------------------------------------
     return res.status(200).json({ success: true, message: 'Lead guardado y procesado con éxito' });
 
   } catch (error) {
@@ -638,13 +425,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Error interno al procesar la solicitud' });
   }
 }
-
-// ==========================================
-// RATE LIMIT CACHE (módulo-level, respaldo en memoria)
-// IMPORTANTE: En serverless esto se reinicia entre instancias frías.
-// Para mayor robustez, migrar a Upstash Redis:
-// https://upstash.com/docs/redis/sdks/ratelimit-ts/overview
-// ==========================================
-const ipCache = new Map();
-const RATE_LIMIT_WINDOW_MS = 120 * 1000;
-const MAX_REQUESTS = 1;
