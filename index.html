@@ -125,7 +125,7 @@
     </div>
 </section>
 
-<!-- Modal 1: Datos Iniciales (Solo Nombre, Empresa, Correo) -->
+<!-- Modal 1: Datos Iniciales (Paso 1 del Registro) -->
 <div id="start-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm px-4">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl scale-in relative overflow-hidden max-h-[90vh] overflow-y-auto">
         <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
@@ -133,7 +133,7 @@
             <span class="material-symbols-outlined text-blue-600 text-3xl">assignment_ind</span>
             <h3 class="text-2xl font-bold text-slate-900">Tus Datos</h3>
         </div>
-        <p class="text-slate-500 mb-6 text-sm">Ingresa tu información para personalizar el diagnóstico y recibir el informe en tu correo.</p>
+        <p class="text-slate-500 mb-6 text-sm">Ingresa tu información para personalizar el diagnóstico.</p>
         
         <div class="space-y-4 mb-6" onkeypress="handleStartFormKeypress(event)">
             <div>
@@ -151,7 +151,7 @@
         </div>
 
         <div class="flex flex-col gap-3">
-            <button onclick="submitStartForm()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-bold transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group">
+            <button id="btn-start-submit" onclick="submitStartForm()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-bold transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group">
                 Comenzar Diagnóstico <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
             <button onclick="closeStartModal()" class="text-slate-400 hover:text-slate-600 text-xs font-medium transition text-center w-full mt-2">
@@ -161,7 +161,7 @@
     </div>
 </div>
 
-<!-- Modal 2: Teléfono (Aparece al hacer click en Enviar Resultados) -->
+<!-- Modal 2: Teléfono Obligatorio (Paso 2) -->
 <div id="phone-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm px-4">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl scale-in text-center relative overflow-hidden">
         <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
@@ -169,16 +169,14 @@
             <span class="material-symbols-outlined text-3xl">phone_iphone</span>
         </div>
         <h3 class="text-2xl font-bold text-slate-900 mb-2">Un último paso...</h3>
-        <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico (10 dígitos) para que un experto pueda contactarte directamente con tu análisis.</p>
-        <input type="tel" id="user-phone-input" maxlength="10" placeholder="Ej. 5512345678" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
+        <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico con código de país (ej. +52) para validar y procesar tu evaluación con Inteligencia Artificial.</p>
+        
+        <input type="tel" id="user-phone-input" maxlength="15" placeholder="+521122334455" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
         
         <button id="btn-submit-phone" onclick="submitWithPhone()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-200 flex items-center justify-center gap-2 mb-4 group">
             Obtener Resultados <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
-        <button id="btn-skip-phone" onclick="submitWithoutPhone()" class="text-slate-400 hover:text-slate-600 text-xs font-medium underline underline-offset-4 transition">
-            Omitir y enviar resultados
-        </button>
-        <button id="btn-close-phone" onclick="closePhoneModal()" class="mt-6 block w-full text-slate-400 hover:text-slate-600 text-xs font-medium transition">
+        <button id="btn-close-phone" onclick="closePhoneModal()" class="block w-full text-slate-400 hover:text-slate-600 text-xs font-medium transition">
             Cancelar
         </button>
     </div>
@@ -271,7 +269,7 @@
                 <!-- Caja de Acción para enviar resultados -->
                 <div class="bg-blue-50 rounded-xl p-6 border border-blue-100 mt-8 text-left no-print" id="send-action-box">
                     <h4 class="text-lg font-bold text-slate-800 mb-2">¿Quieres ver los detalles de esta evaluación?</h4>
-                    <p class="text-slate-600 text-sm mb-4">Haz clic en el botón inferior para generar tu informe completo con IA y enviarlo a <strong id="display-user-email" class="text-blue-900"></strong>.</p>
+                    <p class="text-slate-600 text-sm mb-4">Haz clic en el botón inferior para procesar tu informe completo con IA.</p>
                     <button onclick="openPhoneModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg flex items-center justify-center gap-2">
                         <span>Enviar Resultados</span>
                         <span class="material-symbols-outlined text-sm">send</span>
@@ -282,10 +280,10 @@
                 <div class="hidden bg-green-50 rounded-xl p-6 border border-green-100 mt-8 text-left no-print" id="success-banner">
                     <div class="flex items-center gap-3 mb-2">
                         <span class="material-symbols-outlined text-green-600 text-2xl">check_circle</span>
-                        <h4 class="text-lg font-bold text-green-800">¡Análisis completado!</h4>
+                        <h4 class="text-lg font-bold text-green-800">¡Análisis enviado!</h4>
                     </div>
                     <p class="text-green-700 text-sm leading-relaxed">
-                        Hemos enviado el informe completo con las recomendaciones personalizadas de nuestra Inteligencia Artificial a tu correo.
+                        Nuestro equipo de IA ha procesado sus datos. Un asesor se comunicará al número proporcionado a la brevedad.
                     </p>
                 </div>
             </div>
@@ -325,9 +323,7 @@
 <script>
         // CONFIGURACIÓN DE SEGURIDAD PARA MATCH CON BACKEND
         const SECURITY_CONFIG = {
-            // El backend espera una cabecera llamada 'version' con el valor de API_SECRET
-            // Cambia este valor al TOKEN que configuraste en tus variables de entorno de Vercel (API_SECRET)
-            API_TOKEN: "gX9#mK2$pL7qRt4vNw" 
+            API_TOKEN: "TU_TOKEN_AQUÍ" 
         };
 
         const prospectingQuestions = [
@@ -366,7 +362,9 @@
         let currentMaxScore = 50; 
         let currentRiskLevel = '';
         
-        // Variables globales para el lead
+        // ID asignado por el backend en el Paso 1
+        let currentFirebaseLeadId = null;
+
         let currentUserName = ''; 
         let currentCompany = '';
         let currentEmail = ''; 
@@ -408,42 +406,65 @@
             chevron.classList.toggle('rotate-180');
         };
 
-        // --- MANEJO DEL MODAL INICIAL ---
         window.openStartModal = function() {
             startModal.classList.remove('hidden');
             setTimeout(() => document.getElementById('user-name-input').focus(), 100);
         }
         
         window.closeStartModal = function() { startModal.classList.add('hidden'); }
-        
         window.handleStartFormKeypress = function(e) { if (e.key === 'Enter') submitStartForm(); }
 
-        window.submitStartForm = function() {
+        // --- PASO 1: CREAR EL LEAD EN FIREBASE ---
+        window.submitStartForm = async function() {
             const nameVal = document.getElementById('user-name-input').value.trim();
             const companyVal = document.getElementById('user-company-input').value.trim();
             const emailVal = document.getElementById('user-email-input').value.trim();
 
-            // Validaciones Obligatorias
-            if (!nameVal || !companyVal || !emailVal) {
-                return alert("Por favor, completa tu nombre, empresa y correo para continuar.");
-            }
-            if (!emailVal.includes('@')) {
-                return alert("Por favor, ingresa un correo electrónico válido.");
-            }
-            if (nameVal.length > 40 || companyVal.length > 40) {
-                return alert("El nombre o la empresa son demasiado largos.");
-            }
+            if (!nameVal || !companyVal || !emailVal) return alert("Por favor, completa tu nombre, empresa y correo.");
+            if (!emailVal.includes('@')) return alert("Por favor, ingresa un correo electrónico válido.");
+            if (nameVal.length > 40 || companyVal.length > 40) return alert("El nombre o la empresa son demasiado largos.");
 
-            // Guardamos datos en memoria
-            currentUserName = nameVal;
-            currentCompany = companyVal;
-            currentEmail = emailVal;
+            const btnStart = document.getElementById('btn-start-submit');
+            const originalText = btnStart.innerHTML;
+            btnStart.innerHTML = `<span class="animate-spin material-symbols-outlined">progress_activity</span> Validando...`;
+            btnStart.disabled = true;
 
-            closeStartModal();
-            startAssessment();
+            const combinedName = (nameVal + " - " + companyVal).substring(0, 80);
+
+            try {
+                const response = await fetch('/api/guardar-lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'version': SECURITY_CONFIG.API_TOKEN },
+                    body: JSON.stringify({
+                        action: 'create',
+                        name: combinedName,
+                        email: emailVal
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentFirebaseLeadId = data.leadId; // Guardamos la llave para el paso 2
+                    
+                    currentUserName = nameVal;
+                    currentCompany = companyVal;
+                    currentEmail = emailVal;
+
+                    closeStartModal();
+                    startAssessment();
+                } else {
+                    const errorData = await response.json();
+                    alert("Hubo un problema de conexión: " + (errorData.error || 'Error del servidor'));
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                alert("Hubo un error al iniciar. Revisa tu conexión a internet.");
+            } finally {
+                btnStart.innerHTML = originalText;
+                btnStart.disabled = false;
+            }
         }
 
-        // --- MANEJO DEL CUESTIONARIO ---
         window.startAssessment = function() {
             heroSection.classList.add('hidden');
             wizardSection.classList.remove('hidden');
@@ -460,11 +481,9 @@
             totalSteps.textContent = activeQuestions.length;
             progressBar.style.width = `${((currentStep) / activeQuestions.length) * 100}%`;
 
-            const savedAnswer = answers[q.id]; // Revisamos si ya había contestado esto antes
+            const savedAnswer = answers[q.id];
 
             let html = '';
-            
-            // Botón de volver dentro de la tarjeta blanca
             if (currentStep > 0) {
                 html += `
                 <div class="mb-6">
@@ -477,8 +496,6 @@
             html += `<h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3><div class="mb-8"></div><div class="grid grid-cols-1 gap-3">`;
             q.options.forEach((opt, idx) => {
                 const labelArg = opt.label.replace(/'/g, "\\'");
-                
-                // Lógica visual para resaltar la respuesta previamente seleccionada
                 const isSelected = savedAnswer && savedAnswer.value === opt.val;
                 const borderClasses = isSelected ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 shadow-md' : 'border-slate-100 bg-white hover:border-blue-500 hover:shadow-lg';
                 const circleClasses = isSelected ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600';
@@ -491,15 +508,12 @@
                     </div>`;
             });
             html += `</div>`;
-
             questionCard.innerHTML = html;
         }
 
         window.selectAnswer = function(qid, val, label) {
-            // Guardamos con la estructura que el backend espera
             answers[qid] = { value: val, label: label };
             safeLogEvent('question_answered', { question_id: qid, answer_value: val });
-
             if (currentStep < activeQuestions.length - 1) {
                 currentStep++;
                 setTimeout(renderQuestion, 200);
@@ -508,25 +522,15 @@
             }
         }
 
-        // --- BOTÓN DE VOLVER ---
         window.goBack = function() {
-            if (currentStep > 0) {
-                currentStep--;
-                renderQuestion();
-            }
+            if (currentStep > 0) { currentStep--; renderQuestion(); }
         }
 
-        // --- FLUJO FINAL (Carga sin envío) ---
         window.finishAssessment = function() {
             wizardSection.classList.add('hidden');
             loadingSection.classList.remove('hidden');
-            
             document.getElementById('loading-fact').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
-            
-            // Calculamos los resultados
             calculateResults();
-            
-            // Simulamos el tiempo de procesamiento de puntaje y mostramos resultados
             setTimeout(() => {
                 loadingSection.classList.add('hidden');
                 resultsSection.classList.remove('hidden');
@@ -541,7 +545,6 @@
             });
             currentCalculatedScore = totalPoints;
             document.getElementById('display-user-name').textContent = currentUserName;
-            document.getElementById('display-user-email').textContent = currentEmail; // Para el texto de invitación
             updateDashboard(totalPoints, 50);
         }
 
@@ -581,88 +584,60 @@
             }
         }
 
-        // --- MANEJO DEL MODAL DE TELÉFONO PARA ENVÍO ---
         window.openPhoneModal = function() {
             phoneModal.classList.remove('hidden');
             setTimeout(() => document.getElementById('user-phone-input').focus(), 100);
         }
 
-        window.closePhoneModal = function() {
-            phoneModal.classList.add('hidden');
-        }
+        window.closePhoneModal = function() { phoneModal.classList.add('hidden'); }
 
-        window.submitWithPhone = function() {
+        // --- PASO 2: ACTUALIZAR EL LEAD CON TELÉFONO Y RESPUESTAS ---
+        window.submitWithPhone = async function() {
             const phone = document.getElementById('user-phone-input').value.trim();
-            // Validación Estricta: Si ingresan algo, deben ser 10 dígitos numéricos exactos
-            if (phone !== "" && !/^[0-9]{10}$/.test(phone)) {
-                return alert("El número telefónico debe ser de 10 dígitos numéricos exactos (ej: 8112345678).");
-            }
-            sendDataToBackend(phone);
-        }
-
-        window.submitWithoutPhone = function() { 
-            sendDataToBackend(""); 
-        }
-
-        // --- CONEXIÓN DE ENVÍO FINAL AL BACKEND ---
-        window.sendDataToBackend = async function(phoneNumber) {
-            const btnSubmit = document.getElementById('btn-submit-phone');
-            const btnSkip = document.getElementById('btn-skip-phone');
-            const btnClose = document.getElementById('btn-close-phone');
             
+            // Validación estricta: Empieza con + seguido de 10 a 15 números
+            if (!/^\+[0-9]{10,15}$/.test(phone)) {
+                return alert("El número debe incluir tu código de país (+lada) y ser válido (ej. +528112233445).");
+            }
+            
+            const btnSubmit = document.getElementById('btn-submit-phone');
+            const btnClose = document.getElementById('btn-close-phone');
             const originalText = btnSubmit.innerHTML;
             
-            // Estado de "Enviando"
             btnSubmit.innerHTML = `<span class="animate-spin material-symbols-outlined">progress_activity</span> Enviando...`;
             btnSubmit.disabled = true;
-            btnSkip.disabled = true;
             btnClose.disabled = true;
-
-            // Unimos el Nombre y la Empresa para que el backend lo guarde sin modificar su código. 
-            // Restringimos a 80 caracteres como exige el backend.
-            const combinedName = (currentUserName + " - " + currentCompany).substring(0, 80);
-
-            const payload = {
-                name: combinedName,
-                email: currentEmail,
-                phone: phoneNumber || "No proporcionado",
-                score: currentCalculatedScore,
-                level: currentRiskLevel,
-                answers: answers
-            };
 
             try {
                 const response = await fetch('/api/guardar-lead', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'version': SECURITY_CONFIG.API_TOKEN // Token obligatorio por el backend seguro
-                    },
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'application/json', 'version': SECURITY_CONFIG.API_TOKEN },
+                    body: JSON.stringify({
+                        action: 'update',
+                        leadId: currentFirebaseLeadId, // Usamos la ID creada en el paso 1
+                        phone: phone,
+                        score: currentCalculatedScore,
+                        level: currentRiskLevel,
+                        answers: answers
+                    })
                 });
 
                 if (response.ok) {
                     safeLogEvent('lead_generated', { score: currentCalculatedScore, risk_level: currentRiskLevel });
-                    
-                    // Ocultamos el modal y la caja de enviar, y mostramos el banner de éxito
                     closePhoneModal();
                     document.getElementById('send-action-box').classList.add('hidden');
                     document.getElementById('success-banner').classList.remove('hidden');
-                    
-                    // Nos desplazamos hacia arriba para que el usuario vea el mensaje de éxito
                     document.getElementById('results-section').scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     const errorData = await response.json();
                     alert("Hubo un problema: " + (errorData.error || 'Error del servidor'));
                 }
             } catch (error) {
-                console.error("Error de comunicación con el backend:", error);
+                console.error("Error de comunicación:", error);
                 alert("Hubo un error de conexión al enviar tus datos. Reintenta más tarde.");
             } finally {
-                // Restauramos los botones por si hubo error y quieren reintentar
                 btnSubmit.innerHTML = originalText;
                 btnSubmit.disabled = false;
-                btnSkip.disabled = false;
                 btnClose.disabled = false;
             }
         }
