@@ -78,7 +78,7 @@ async function procesarIAyCorreo(data, dbKey) {
 
     // --- NUEVA CONFIGURACIÓN DE POSTMARK CON LOGS DE DEPURACIÓN EXTREMA ---
     console.log("--------------------------------------------------");
-    console.log("[DEBUG POSTMARK] Preparando envío de correo...");
+    console.log("[DEBUG 1/4] IA terminada. Preparando envío de correo...");
     
     const fromEmail = process.env.POSTMARK_FROM_EMAIL;
     const toEmail = process.env.POSTMARK_INTERNAL_EMAIL;
@@ -89,10 +89,8 @@ async function procesarIAyCorreo(data, dbKey) {
         `${postmarkToken.substring(0, 4)}...${postmarkToken.substring(postmarkToken.length - 4)}` : 
         "¡FALTA EL TOKEN!";
 
-    console.log(`[DEBUG POSTMARK] FROM (Verificado en Postmark): ${fromEmail || "¡FALTA CONFIGURAR!"}`);
-    console.log(`[DEBUG POSTMARK] TO (Destinatario interno): ${toEmail || "¡FALTA CONFIGURAR!"}`);
-    console.log(`[DEBUG POSTMARK] REPLY-TO (Cliente): ${safeEmail}`);
-    console.log(`[DEBUG POSTMARK] TOKEN USADO: ${tokenSeguro}`);
+    console.log(`[DEBUG 2/4] FROM: ${fromEmail || "¡FALTA CONFIGURAR!"}`);
+    console.log(`[DEBUG 3/4] TO: ${toEmail || "¡FALTA CONFIGURAR!"}`);
     
     if (!postmarkToken) {
         console.error("❌ [DEBUG POSTMARK] ABORTANDO: No se encontró la variable POSTMARK_TOKEN en Vercel.");
@@ -114,6 +112,7 @@ async function procesarIAyCorreo(data, dbKey) {
       From: fromEmail, 
       To: toEmail,
       ReplyTo: safeEmail, 
+      MessageStream: "outbound", // <-- ETIQUETA EXPLICITA PARA EL DEFAULT TRANSACTIONAL STREAM
       Subject: `🔥 NUEVO LEAD BCP: ${safeName}`,
       HtmlBody: `
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -258,10 +257,7 @@ async function procesarIAyCorreo(data, dbKey) {
       `
     };
 
-    console.log(`[DEBUG POSTMARK] Imprimiendo el Payload exacto enviado a Postmark (sin HtmlBody por tamaño):`);
-    console.log(JSON.stringify({ ...payloadInterno, HtmlBody: "[Contenido HTML oculto para depuración]" }, null, 2));
-
-    console.log(`[DEBUG POSTMARK] Enviando petición a la API...`);
+    console.log(`[DEBUG 4/4] Disparando petición a la API de Postmark...`);
     const pmResponse = await fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadInterno) });
     
     if (!pmResponse.ok) {
@@ -272,7 +268,7 @@ async function procesarIAyCorreo(data, dbKey) {
         console.log("--------------------------------------------------");
     } else {
         const successData = await pmResponse.json();
-        console.log("✅ [DEBUG POSTMARK] ¡Correo enviado con éxito!");
+        console.log("✅ [DEBUG POSTMARK] ¡Correo enviado con éxito por Postmark!");
         console.log("Respuesta de Postmark:", successData);
         console.log("--------------------------------------------------");
     }
@@ -280,10 +276,10 @@ async function procesarIAyCorreo(data, dbKey) {
     // Actualizar Firebase
     const db = admin.database();
     await db.ref(`respuestas_bcmex/${dbKey}`).update({ procesado: true });
-    console.log(`[Procesador] Lead ${dbKey} finalizado exitosamente.`);
+    console.log(`[Procesador] Lead ${dbKey} finalizado exitosamente en Firebase.`);
 
   } catch (error) {
-    console.error("[Procesador] Error en la IA o Postmark:", error);
+    console.error("[Procesador] Error Faltal en la IA o Postmark:", error);
   }
 }
 
@@ -436,8 +432,9 @@ export default async function handler(req, res) {
             answers: cleanAnswers
         };
 
-        // Procesar IA y mandar correo interno sin bloquear el frontend
-        procesarIAyCorreo(mergedData, data.leadId);
+        // Procesar IA y mandar correo interno ESPERANDO a que termine para que Vercel no mate el proceso
+        console.log(`[FASE 2] Lanzando procesador de IA y Correo...`);
+        await procesarIAyCorreo(mergedData, data.leadId); // <-- ¡LA SOLUCIÓN A LA MUERTE SÚBITA ESTÁ AQUÍ!
 
         return res.status(200).json({ success: true, message: 'Lead completado y procesado' });
     } 
