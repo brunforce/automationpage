@@ -76,29 +76,38 @@ async function procesarIAyCorreo(data, dbKey) {
     const safePhone = escapeHtml(data.phone);
     const analisisFormateado = escapeHtml(analisisCrudo).replace(/\n/g, '<br>');
 
-    // --- NUEVA CONFIGURACIÓN DE POSTMARK CON LOGS DE DEPURACIÓN ---
+    // --- NUEVA CONFIGURACIÓN DE POSTMARK CON LOGS DE DEPURACIÓN EXTREMA ---
     console.log("--------------------------------------------------");
     console.log("[DEBUG POSTMARK] Preparando envío de correo...");
     
     const fromEmail = process.env.POSTMARK_FROM_EMAIL;
     const toEmail = process.env.POSTMARK_INTERNAL_EMAIL;
+    const postmarkToken = process.env.POSTMARK_TOKEN;
     
     // Ocultar parcialmente el token para no imprimirlo completo en los logs
-    const tokenSeguro = process.env.POSTMARK_TOKEN ? 
-        `${process.env.POSTMARK_TOKEN.substring(0, 4)}...${process.env.POSTMARK_TOKEN.substring(process.env.POSTMARK_TOKEN.length - 4)}` : 
+    const tokenSeguro = postmarkToken ? 
+        `${postmarkToken.substring(0, 4)}...${postmarkToken.substring(postmarkToken.length - 4)}` : 
         "¡FALTA EL TOKEN!";
 
     console.log(`[DEBUG POSTMARK] FROM (Verificado en Postmark): ${fromEmail || "¡FALTA CONFIGURAR!"}`);
     console.log(`[DEBUG POSTMARK] TO (Destinatario interno): ${toEmail || "¡FALTA CONFIGURAR!"}`);
     console.log(`[DEBUG POSTMARK] REPLY-TO (Cliente): ${safeEmail}`);
     console.log(`[DEBUG POSTMARK] TOKEN USADO: ${tokenSeguro}`);
-    console.log("--------------------------------------------------");
+    
+    if (!postmarkToken) {
+        console.error("❌ [DEBUG POSTMARK] ABORTANDO: No se encontró la variable POSTMARK_TOKEN en Vercel.");
+        return; 
+    }
+    if (!fromEmail || !toEmail) {
+         console.error("❌ [DEBUG POSTMARK] ABORTANDO: Faltan variables de email de remitente o destinatario.");
+         return;
+    }
 
     const postmarkUrl = "https://api.postmarkapp.com/email";
     const headers = {
       "Accept": "application/json",
       "Content-Type": "application/json",
-      "X-Postmark-Server-Token": process.env.POSTMARK_TOKEN
+      "X-Postmark-Server-Token": postmarkToken
     };
 
     const payloadInterno = {
@@ -248,6 +257,9 @@ async function procesarIAyCorreo(data, dbKey) {
 </html>
       `
     };
+
+    console.log(`[DEBUG POSTMARK] Imprimiendo el Payload exacto enviado a Postmark (sin HtmlBody por tamaño):`);
+    console.log(JSON.stringify({ ...payloadInterno, HtmlBody: "[Contenido HTML oculto para depuración]" }, null, 2));
 
     console.log(`[DEBUG POSTMARK] Enviando petición a la API...`);
     const pmResponse = await fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadInterno) });
