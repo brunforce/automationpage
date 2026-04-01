@@ -76,7 +76,24 @@ async function procesarIAyCorreo(data, dbKey) {
     const safePhone = escapeHtml(data.phone);
     const analisisFormateado = escapeHtml(analisisCrudo).replace(/\n/g, '<br>');
 
-    // --- NUEVA CONFIGURACIÓN DE POSTMARK ---
+    // --- NUEVA CONFIGURACIÓN DE POSTMARK CON LOGS DE DEPURACIÓN ---
+    console.log("--------------------------------------------------");
+    console.log("[DEBUG POSTMARK] Preparando envío de correo...");
+    
+    const fromEmail = process.env.POSTMARK_FROM_EMAIL;
+    const toEmail = process.env.POSTMARK_INTERNAL_EMAIL;
+    
+    // Ocultar parcialmente el token para no imprimirlo completo en los logs
+    const tokenSeguro = process.env.POSTMARK_TOKEN ? 
+        `${process.env.POSTMARK_TOKEN.substring(0, 4)}...${process.env.POSTMARK_TOKEN.substring(process.env.POSTMARK_TOKEN.length - 4)}` : 
+        "¡FALTA EL TOKEN!";
+
+    console.log(`[DEBUG POSTMARK] FROM (Verificado en Postmark): ${fromEmail || "¡FALTA CONFIGURAR!"}`);
+    console.log(`[DEBUG POSTMARK] TO (Destinatario interno): ${toEmail || "¡FALTA CONFIGURAR!"}`);
+    console.log(`[DEBUG POSTMARK] REPLY-TO (Cliente): ${safeEmail}`);
+    console.log(`[DEBUG POSTMARK] TOKEN USADO: ${tokenSeguro}`);
+    console.log("--------------------------------------------------");
+
     const postmarkUrl = "https://api.postmarkapp.com/email";
     const headers = {
       "Accept": "application/json",
@@ -85,9 +102,9 @@ async function procesarIAyCorreo(data, dbKey) {
     };
 
     const payloadInterno = {
-      From: process.env.POSTMARK_FROM_EMAIL, // OBLIGATORIO: Debe ser un correo verificado en Postmark
-      To: process.env.POSTMARK_INTERNAL_EMAIL, // Tu correo personal o el de tu equipo
-      ReplyTo: safeEmail, // ¡MAGIA! Mejora entregabilidad y permite responder directo al cliente
+      From: fromEmail, 
+      To: toEmail,
+      ReplyTo: safeEmail, 
       Subject: `🔥 NUEVO LEAD BCP: ${safeName}`,
       HtmlBody: `
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -232,16 +249,20 @@ async function procesarIAyCorreo(data, dbKey) {
       `
     };
 
-    console.log(`[Postmark] Enviando análisis crudo al equipo...`);
+    console.log(`[DEBUG POSTMARK] Enviando petición a la API...`);
     const pmResponse = await fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadInterno) });
     
-    // --- MEJORA DE DEBUGGING: Si falla Postmark, imprimirá exactamente por qué ---
     if (!pmResponse.ok) {
         const errorText = await pmResponse.text();
-        console.error("❌ ERROR EN POSTMARK: El correo no se pudo enviar.");
+        console.error("❌ [DEBUG POSTMARK] ERROR CRÍTICO AL ENVIAR CORREO:");
+        console.error(`Código HTTP: ${pmResponse.status} ${pmResponse.statusText}`);
         console.error("Detalles del error devuelto por Postmark:", errorText);
+        console.log("--------------------------------------------------");
     } else {
-        console.log("✅ [Postmark] Correo interno enviado con éxito.");
+        const successData = await pmResponse.json();
+        console.log("✅ [DEBUG POSTMARK] ¡Correo enviado con éxito!");
+        console.log("Respuesta de Postmark:", successData);
+        console.log("--------------------------------------------------");
     }
 
     // Actualizar Firebase
