@@ -34,7 +34,7 @@ function escapeHtml(str) {
 
 const ipCache = new Map();
 const RATE_LIMIT_WINDOW_MS = 120 * 1000;
-const MAX_REQUESTS = 3; // Aumentado a 3 para permitir el flujo de 2 pasos del mismo usuario
+const MAX_REQUESTS = 3; 
 
 // ==========================================
 // FUNCIÓN AUXILIAR: PROCESAMIENTO IA Y POSTMARK (1 SOLO CORREO)
@@ -71,6 +71,12 @@ async function procesarIAyCorreo(data, dbKey) {
       throw new Error("Gemini devolvió una respuesta vacía.");
     }
 
+    const safeName = escapeHtml(data.name);
+    const safeEmail = escapeHtml(data.email);
+    const safePhone = escapeHtml(data.phone);
+    const analisisFormateado = escapeHtml(analisisCrudo).replace(/\n/g, '<br>');
+
+    // --- NUEVA CONFIGURACIÓN DE POSTMARK ---
     const postmarkUrl = "https://api.postmarkapp.com/email";
     const headers = {
       "Accept": "application/json",
@@ -78,14 +84,10 @@ async function procesarIAyCorreo(data, dbKey) {
       "X-Postmark-Server-Token": process.env.POSTMARK_TOKEN
     };
 
-    const safeName = escapeHtml(data.name);
-    const safeEmail = escapeHtml(data.email);
-    const safePhone = escapeHtml(data.phone);
-    const analisisFormateado = escapeHtml(analisisCrudo).replace(/\n/g, '<br>');
-
     const payloadInterno = {
-      From: process.env.POSTMARK_FROM_EMAIL,
-      To: process.env.POSTMARK_INTERNAL_EMAIL,
+      From: process.env.POSTMARK_FROM_EMAIL, // OBLIGATORIO: Debe ser un correo verificado en Postmark
+      To: process.env.POSTMARK_INTERNAL_EMAIL, // Tu correo personal o el de tu equipo
+      ReplyTo: safeEmail, // ¡MAGIA! Mejora entregabilidad y permite responder directo al cliente
       Subject: `🔥 NUEVO LEAD BCP: ${safeName}`,
       HtmlBody: `
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -233,8 +235,13 @@ async function procesarIAyCorreo(data, dbKey) {
     console.log(`[Postmark] Enviando análisis crudo al equipo...`);
     const pmResponse = await fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadInterno) });
     
+    // --- MEJORA DE DEBUGGING: Si falla Postmark, imprimirá exactamente por qué ---
     if (!pmResponse.ok) {
-        console.error("Error en Postmark:", await pmResponse.text());
+        const errorText = await pmResponse.text();
+        console.error("❌ ERROR EN POSTMARK: El correo no se pudo enviar.");
+        console.error("Detalles del error devuelto por Postmark:", errorText);
+    } else {
+        console.log("✅ [Postmark] Correo interno enviado con éxito.");
     }
 
     // Actualizar Firebase
@@ -352,7 +359,6 @@ export default async function handler(req, res) {
     else if (data.action === 'update') {
         if (!data.leadId) return res.status(400).json({ error: 'Falta ID de lead' });
 
-        // NUEVA VALIDACIÓN: Teléfono obligatorio con formato +LADA
         if (!data.phone || typeof data.phone !== 'string' || !/^\+[0-9]{10,15}$/.test(data.phone.trim())) {
             return res.status(400).json({ error: 'El teléfono es obligatorio y debe incluir código de país (+lada).' });
         }
@@ -375,14 +381,12 @@ export default async function handler(req, res) {
             }
         }
 
-        // Obtener datos iniciales para el correo
         const leadSnapshot = await db.ref(`respuestas_bcmex/${data.leadId}`).once('value');
         if (!leadSnapshot.exists()) {
             return res.status(404).json({ error: 'Lead no encontrado' });
         }
         const existingData = leadSnapshot.val();
 
-        // Actualizar en DB
         await db.ref(`respuestas_bcmex/${data.leadId}`).update({
             phone: escapeHtml(data.phone.trim()),
             level: escapeHtml(data.level),
@@ -391,7 +395,6 @@ export default async function handler(req, res) {
             status: 'completado'
         });
 
-        // Fusionar datos para la IA
         const mergedData = {
             ...existingData,
             phone: escapeHtml(data.phone.trim()),
@@ -400,8 +403,8 @@ export default async function handler(req, res) {
             answers: cleanAnswers
         };
 
-        // Procesar IA y mandar correo interno
-        await procesarIAyCorreo(mergedData, data.leadId);
+        // Procesar IA y mandar correo interno sin bloquear el frontend
+        procesarIAyCorreo(mergedData, data.leadId);
 
         return res.status(200).json({ success: true, message: 'Lead completado y procesado' });
     } 
