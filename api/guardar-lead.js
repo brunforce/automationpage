@@ -212,9 +212,9 @@ async function procesarIAyCorreo(data, dbKey) {
       throw new Error("Gemini devolvió una respuesta vacía.");
     }
 
-    // Extracción de etiquetas como en Python
-    const matchEmail = analisisCrudo.match(/\[EMAIL_CLIENTE_START\]([\s\S]*?)\[EMAIL_CLIENTE_END\]/i);
-    const matchInterno = analisisCrudo.match(/\[ANALISIS_INTERNO_START\]([\s\S]*?)\[ANALISIS_INTERNO_END\]/i);
+    // Extracción de etiquetas flexible (Soporta [TAG] y $$TAG$$ y posibles saltos de línea)
+    const matchEmail = analisisCrudo.match(/(?:\[|\$\$)\s*EMAIL_CLIENTE_START\s*(?:\]|\$\$)([\s\S]*?)(?:\[|\$\$)\s*EMAIL_CLIENTE_END\s*(?:\]|\$\$)/i);
+    const matchInterno = analisisCrudo.match(/(?:\[|\$\$)\s*ANALISIS_INTERNO_START\s*(?:\]|\$\$)([\s\S]*?)(?:\[|\$\$)\s*ANALISIS_INTERNO_END\s*(?:\]|\$\$)/i);
 
     const textoCorreoCliente = matchEmail ? matchEmail[1].trim() : "No se generó correctamente el bloque para el cliente.";
     const textoAnalisisInterno = matchInterno ? matchInterno[1].trim() : analisisCrudo; // Fallback
