@@ -13,7 +13,6 @@ Nivel de Riesgo Calculado: {{Nivel de Riesgo}}
 
 $$Respuestas de Prospección - Perfil de Empresa$$
 
-
 Participación de mercado: {{Respuesta P1}}
 Tamaño de empresa: {{Respuesta P2}}
 Dependencia digital: {{Respuesta P3}}
@@ -22,7 +21,6 @@ Impacto de interrupción: {{Respuesta P5}}
 Equipo responsable: {{Respuesta P6}}
 
 $$Respuestas Core - Evaluación Técnica BCP$$
-
 
 Impacto Financiero: {{Respuesta Q1}}
 Nivel de interrupción: {{Respuesta Q2}}
@@ -35,7 +33,10 @@ Frecuencia pruebas: {{Respuesta Q8}}
 Detección riesgos: {{Respuesta Q9}}
 
 REGLAS GENERALES Y NOMENCLATURA OBLIGATORIA
-Siempre que te refieras a este cuestionario, herramienta de diagnóstico o estrategia, debes escribir exactamente "BCP-MAP" (con letras mayúsculas y guion medio y sin comillas o signos como *). NUNCA escribas "BCPMAP" o "Bcpmap".
+
+Siempre que te refieras a este cuestionario, herramienta de diagnóstico o estrategia, debes escribir exactamente "BCP-MAP" (con letras mayúsculas y guion medio). NUNCA escribas "BCPMAP" o "Bcpmap".
+
+CERO FORMATO MARKDOWN: El sistema de correos no interpreta etiquetas Markdown. ESTÁ ESTRICTAMENTE PROHIBIDO usar asteriscos (**) para negritas, guiones bajos (__) para cursivas, o almohadillas (#) para títulos. Escribe exclusivamente en texto plano. Para las viñetas, utiliza únicamente un guion normal (-) o un punto medio (•).
 
 INSTRUCCIONES PARTE 1: BORRADOR DE CORREO (PARA EL CLIENTE)
 Redacta el correo para el cliente manteniendo la redacción concisa, evitando redundancias y enfocándote solo en el contenido. Aplica ESTRICTAMENTE esta estructura y las 3 Aristas de análisis:
@@ -66,10 +67,18 @@ Escribe un análisis honesto, directo y sin filtros dirigido al equipo comercial
 FORMATO EXACTO DE SALIDA DE LA IA
 Debes respetar estrictamente las siguientes etiquetas para que nuestro sistema de correos pueda dividir el texto:
 
-[EMAIL_CLIENTE_START]
-(Aquí va el contenido estructurado en Urgente/Importante/Estratégico para el cliente)
-[EMAIL_CLIENTE_END]
+$$EMAIL_CLIENTE_START$$
 
-[ANALISIS_INTERNO_START]
-(Aquí va el análisis rudo en viñetas para ventas)
-[ANALISIS_INTERNO_END]
+
+(Aquí va el contenido estructurado en Urgente/Importante/Estratégico para el cliente, SIN formato Markdown)
+
+
+$$EMAIL_CLIENTE_END$$
+
+$$ANALISIS_INTERNO_START$$
+
+
+(Aquí va el análisis rudo en viñetas para ventas, SIN formato Markdown)
+
+
+$$ANALISIS_INTERNO_END$$
