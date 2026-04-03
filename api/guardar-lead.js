@@ -18,6 +18,25 @@ const MAX_LABEL_LENGTH = 300;
 const SCORE_MIN = 0;
 const SCORE_MAX = 50;
 
+// MAPA DE PREGUNTAS (Para formatear el correo interno)
+const QUESTION_MAP = {
+  p1_market: "¿Cuál es la participación de mercado de su empresa en el país?",
+  p2_employees: "¿Cuántas personas participan directamente en la operación diaria del negocio?",
+  p3_dependency: "¿Qué tan dependiente es su operación de sistemas digitales para generar ingresos?",
+  p4_systems: "¿Cuántos sistemas o aplicaciones son críticos para la operación diaria?",
+  p5_impact: "Una interrupción tecnológica impactaría principalmente en:",
+  p6_team: "¿Existe un equipo o área responsable de continuidad, riesgos o tecnología?",
+  q1_financial: "Considerando la duración estimada de una interrupción en sus procesos clave, ¿qué nivel de pérdida financiera generaría para la organización?",
+  q2_operational: "Si ocurre un incidente crítico en sus procesos clave, ¿Cuál sería el nivel de interrupción operativa a organización?",
+  q3_prioritization: "¿Cómo identifican y priorizan sus procesos críticos para continuidad?",
+  q4_rto: "Para sus procesos críticos, el RTO definido es:",
+  q5_rpo: "En caso de incidente, la pérdida aceptable de información es:",
+  q6_recovery: "La recuperación de sistemas críticos es principalmente:",
+  q7_responsibility: "Si ocurre una falla grave, la responsabilidad de recuperación recae en:",
+  q8_tests: "¿Con qué frecuencia se prueban los planes BCP/DRP?",
+  q9_detection: "¿Cómo detectan riesgos de interrupción antes de que ocurran?"
+};
+
 // ==========================================
 // HELPERS DE SEGURIDAD
 // ==========================================
@@ -39,7 +58,81 @@ const MAX_REQUESTS = 3;
 // ==========================================
 // FUNCIÓN AUXILIAR: GENERADOR DE PLANTILLA HTML
 // ==========================================
-function generarHtmlCorreo(tituloHTML, subtitulo, tituloSeccion, contenidoHTML, safeName, safeEmail, safePhone, score, level) {
+function generarHtmlCorreo({
+  tituloHTML, 
+  subtitulo, 
+  tituloSeccion, 
+  contenidoHTML, 
+  safeName, 
+  safeEmail, 
+  safePhone, 
+  score, 
+  level, 
+  isInternal = false, 
+  respuestas = {}
+}) {
+  
+  // Condicional 1: Bloque de datos del Prospecto
+  let datosProspectoHtml = `<p style="margin:0 0 10px;font-size:22px;font-weight:700;color:#0a1628;">${safeName}</p>`;
+  
+  // Condicional 2: Tabla de Respuestas Cuestionario
+  let respuestasHtml = '';
+
+  if (isInternal) {
+    // Si es interno, mostramos email y teléfono
+    datosProspectoHtml = `
+      <p style="margin:0 0 6px;font-size:13px;color:#4a7cb5;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Datos del Prospecto</p>
+      <p style="margin:0 0 20px;font-size:22px;font-weight:700;color:#0a1628;">${safeName}</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px; border:1px solid #e2e8f0; border-radius: 4px; background:#f8fafc;">
+        <tr>
+          <td style="padding:12px 15px; border-bottom:1px solid #e2e8f0; font-size:14px; color:#334155;"><strong>Email:</strong> <a href="mailto:${safeEmail}" style="color:#1a3a6e; text-decoration:none;">${safeEmail}</a></td>
+        </tr>
+        <tr>
+          <td style="padding:12px 15px; font-size:14px; color:#334155;"><strong>Teléfono:</strong> ${safePhone}</td>
+        </tr>
+      </table>
+    `;
+
+    // Procesar las respuestas y crear la tabla si existen
+    const respArray = Object.entries(respuestas);
+    if (respArray.length > 0) {
+        const filasRespuestas = respArray.map(([key, ans], idx) => {
+            const pregunta = QUESTION_MAP[key] || key;
+            const borderStyle = idx !== respArray.length - 1 ? 'border-bottom:1px solid #e2e8f0;' : '';
+            return `
+            <tr>
+              <td style="padding:12px 15px; ${borderStyle} font-size:13px; color:#334155;">
+                  <strong style="color:#0a1628; display:block; margin-bottom:4px;">${pregunta}</strong>
+                  <span style="color:#4a7cb5;">&#10148; ${ans.label}</span>
+              </td>
+            </tr>`;
+        }).join('');
+
+        respuestasHtml = `
+        <tr>
+          <td bgcolor="#ffffff" style="background:#ffffff;padding:8px 52px 20px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="70" height="1" bgcolor="#bdd7f5" style="font-size:0;line-height:0;">&nbsp;</td>
+                <td align="center" style="padding:0 12px;">
+                  <span style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#4a7cb5;font-weight:600;">&#9670;&nbsp; Respuestas del Cuestionario &nbsp;&#9670;</span>
+                </td>
+                <td width="70" height="1" bgcolor="#bdd7f5" style="font-size:0;line-height:0;">&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#ffffff" style="background:#ffffff;padding:0 52px 24px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0; border-radius: 4px; background:#f8fafc;">
+              ${filasRespuestas}
+            </table>
+          </td>
+        </tr>
+        `;
+    }
+  }
+
   return `
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -84,18 +177,10 @@ function generarHtmlCorreo(tituloHTML, subtitulo, tituloSeccion, contenidoHTML, 
   </tr>
   <tr>
     <td bgcolor="#ffffff" style="background:#ffffff;padding:36px 52px 24px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
-      <p style="margin:0 0 6px;font-size:13px;color:#4a7cb5;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Datos del Prospecto</p>
-      <p style="margin:0 0 20px;font-size:22px;font-weight:700;color:#0a1628;">${safeName}</p>
-      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px; border:1px solid #e2e8f0; border-radius: 4px; background:#f8fafc;">
-        <tr>
-          <td style="padding:12px 15px; border-bottom:1px solid #e2e8f0; font-size:14px; color:#334155;"><strong>Email:</strong> <a href="mailto:${safeEmail}" style="color:#1a3a6e; text-decoration:none;">${safeEmail}</a></td>
-        </tr>
-        <tr>
-          <td style="padding:12px 15px; font-size:14px; color:#334155;"><strong>Teléfono:</strong> ${safePhone}</td>
-        </tr>
-      </table>
+      ${datosProspectoHtml}
     </td>
   </tr>
+  ${respuestasHtml}
   <tr>
     <td bgcolor="#ffffff" style="background:#ffffff;padding:8px 52px 20px;border-left:1px solid #c5d9f0;border-right:1px solid #c5d9f0;">
       <table width="100%" cellpadding="0" cellspacing="0">
@@ -203,7 +288,7 @@ async function procesarIAyCorreo(data, dbKey) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     // Cambiado al modelo solicitado en el script de Python original
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" }); 
     const result = await model.generateContent(promptText);
     
     const analisisCrudo = result.response.text().trim();
@@ -239,36 +324,47 @@ async function procesarIAyCorreo(data, dbKey) {
       "X-Postmark-Server-Token": postmarkToken
     };
 
-    // CORREO 1: Borrador para el cliente (Se envía al comercial)
+    // CORREO 1: Borrador para el cliente (Se envía al comercial, formato limpio)
     const payloadBorradorCliente = {
       From: fromEmail, 
       To: toEmail,
       ReplyTo: safeEmail, 
       MessageStream: "outbound",
       Subject: `[BORRADOR] Correo para Cliente - BCP: ${safeName}`,
-      HtmlBody: generarHtmlCorreo(
-          "Borrador de<br><strong style=\"font-weight:700;\">Correo para Cliente</strong>",
-          "Revisión Humana Requerida",
-          "Borrador Sugerido por IA",
-          escapeHtml(textoCorreoCliente).replace(/\n/g, '<br>'),
-          safeName, safeEmail, safePhone, data.score, data.level
-      )
+      HtmlBody: generarHtmlCorreo({
+          tituloHTML: "Borrador de<br><strong style=\"font-weight:700;\">Correo para Cliente</strong>",
+          subtitulo: "Revisión Humana Requerida",
+          tituloSeccion: "Borrador Sugerido por IA",
+          contenidoHTML: escapeHtml(textoCorreoCliente).replace(/\n/g, '<br>'),
+          safeName, 
+          safeEmail, 
+          safePhone, 
+          score: data.score, 
+          level: data.level,
+          isInternal: false // <--- No muestra los datos completos ni el listado de preguntas
+      })
     };
 
-    // CORREO 2: Análisis en crudo (Se envía al comercial)
+    // CORREO 2: Análisis en crudo (Se envía al comercial, formato completo)
     const payloadAnalisisInterno = {
       From: fromEmail, 
       To: toEmail,
       ReplyTo: safeEmail,
       MessageStream: "outbound",
       Subject: `🔥 NUEVO LEAD BCP (Análisis Interno): ${safeName}`,
-      HtmlBody: generarHtmlCorreo(
-          "Análisis Interno de<br><strong style=\"font-weight:700;\">Resiliencia Empresarial</strong>",
-          "Informe Confidencial (No compartir)",
-          "Análisis Crudo de IA",
-          escapeHtml(textoAnalisisInterno).replace(/\n/g, '<br>'),
-          safeName, safeEmail, safePhone, data.score, data.level
-      )
+      HtmlBody: generarHtmlCorreo({
+          tituloHTML: "Análisis Interno de<br><strong style=\"font-weight:700;\">Resiliencia Empresarial</strong>",
+          subtitulo: "Informe Confidencial (No compartir)",
+          tituloSeccion: "Análisis Crudo de IA",
+          contenidoHTML: escapeHtml(textoAnalisisInterno).replace(/\n/g, '<br>'),
+          safeName, 
+          safeEmail, 
+          safePhone, 
+          score: data.score, 
+          level: data.level,
+          isInternal: true, // <--- Activa la visualización de contacto completo y tabla de Q&A
+          respuestas: data.answers 
+      })
     };
 
     // Enviar ambos correos en paralelo
