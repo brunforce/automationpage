@@ -237,7 +237,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
   const db = admin.database();
   try {
     const promptPath = path.join(process.cwd(), 'api', 'prompt.txt');
-    if (!fs.existsSync(promptPath)) throw new Error("No se encontró el archivo prompt.txt");
+    if (!fs.existsSync(promptPath)) throw new Error("No se encontró el archivo prompt.txt en la carpeta api/");
     let promptText = fs.readFileSync(promptPath, 'utf8');
 
     // Sanitización específica contra Prompt Injection
@@ -252,6 +252,8 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
       const regex = new RegExp(`{{Respuesta ${shortId}}}`, 'g');
       promptText = promptText.replace(regex, sanitizeForPrompt(label, MAX_LABEL_LENGTH));
     }
+
+    if (!process.env.GEMINI_API_KEY) throw new Error("Falta la variable de entorno GEMINI_API_KEY en Vercel.");
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
@@ -275,7 +277,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
     const toEmail = process.env.POSTMARK_INTERNAL_EMAIL;
     const postmarkToken = process.env.POSTMARK_TOKEN;
     
-    if (!postmarkToken || !fromEmail || !toEmail) throw new Error("Faltan variables de entorno para Postmark.");
+    if (!postmarkToken || !fromEmail || !toEmail) throw new Error("Faltan variables de entorno para Postmark (POSTMARK_TOKEN, POSTMARK_FROM_EMAIL, o POSTMARK_INTERNAL_EMAIL).");
 
     const postmarkUrl = "https://api.postmarkapp.com/email";
     const headers = {
@@ -323,7 +325,14 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
         fetch(postmarkUrl, { method: 'POST', headers, body: JSON.stringify(payloadAnalisisInterno) })
     ]);
     
-    if (!res1.ok || !res2.ok) throw new Error("Fallo en API de Postmark");
+    if (!res1.ok) {
+        const errText1 = await res1.text();
+        throw new Error(`Fallo en Postmark (Correo 1): ${errText1}`);
+    }
+    if (!res2.ok) {
+        const errText2 = await res2.text();
+        throw new Error(`Fallo en Postmark (Correo 2): ${errText2}`);
+    }
 
     await db.ref(`respuestas_bcmex/${dbKey}`).update({ procesado: true });
 
@@ -332,33 +341,35 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
     await db.ref(`respuestas_bcmex/${dbKey}`).update({ procesado: 'error_email' });
 
     // ==============================================================
-    // PLAN B: ALERTA DE RESCATE (WEBHOOK MANUAL POR CORREO)
+    // PLAN B: ALERTA DE RESCATE CON DETALLE DE ERROR
     // ==============================================================
     try {
         const safeName = escapeHtml(data.name);
         const safeEmail = escapeHtml(data.email);
         const safePhone = escapeHtml(data.phone);
         
-        // Creamos la URL segura de reintento usando una LLAVE PRIVADA EXCLUSIVA para el backend
+        // Creamos la URL segura y CODIFICAMOS el token para evitar que el símbolo '#' lo rompa
         const host = reqHost || 'bcpscore.vercel.app';
+        const retrySecret = process.env.RETRY_SECRET || process.env.API_SECRET || ''; 
+        const encodedToken = encodeURIComponent(retrySecret); // ← ¡AQUÍ ESTÁ LA MAGIA PARA EL SIMBOLO #!
         
-        // Exigimos RETRY_SECRET. Si no existe, usamos API_SECRET temporalmente para que no se rompa hoy.
-        const retrySecret = process.env.RETRY_SECRET || process.env.API_SECRET; 
-        const retryUrl = `https://${host}/api/guardar-lead?action=retry&leadId=${dbKey}&token=${retrySecret}`;
+        const retryUrl = `https://${host}/api/guardar-lead?action=retry&leadId=${dbKey}&token=${encodedToken}`;
 
         const fallbackHtml = generarHtmlCorreo({
-            tituloHTML: "Alerta de Fallo en IA<br><strong style=\"font-weight:700;\">Datos Rescatados</strong>",
+            tituloHTML: "Alerta de Fallo en Procesamiento<br><strong style=\"font-weight:700;\">Datos Rescatados</strong>",
             subtitulo: "ACCIÓN MANUAL REQUERIDA",
             tituloSeccion: "Datos Crudos del Prospecto",
             contenidoHTML: `
                 <div style="background-color:#fee2e2; border:1px solid #f87171; border-radius:6px; padding:16px; margin-bottom:20px;">
-                    <p style="color:#b91c1c; font-weight:bold; margin:0 0 8px 0;">⚠️ La Inteligencia Artificial falló por saturación del servidor.</p>
-                    <p style="color:#7f1d1d; font-size:13px; margin:0;">¡Pero no perdimos al prospecto! Sus datos están seguros en la base de datos.</p>
+                    <p style="color:#b91c1c; font-weight:bold; margin:0 0 8px 0;">⚠️ Falló la generación de los correos automáticos.</p>
+                    <p style="color:#7f1d1d; font-size:13px; margin:0 0 8px 0;">El servidor reportó el siguiente error técnico:</p>
+                    <pre style="background:#fef2f2; color:#991b1b; padding:10px; border-radius:4px; font-size:11px; overflow-x:auto; border:1px solid #fca5a5;">${escapeHtml(error.message || 'Error desconocido')}</pre>
+                    <p style="color:#7f1d1d; font-size:13px; margin-top:8px;">Tus datos de prospecto están a salvo en la base de datos.</p>
                 </div>
                 <div style="text-align:center; padding:20px 0;">
-                    <a href="${retryUrl}" style="background-color:#1a3a6e; color:#ffffff; padding:14px 28px; text-decoration:none; border-radius:6px; font-weight:bold; display:inline-block; letter-spacing:1px; font-size:14px;">🔄 REINTENTAR ANÁLISIS CON IA</a>
+                    <a href="${retryUrl}" style="background-color:#1a3a6e; color:#ffffff; padding:14px 28px; text-decoration:none; border-radius:6px; font-weight:bold; display:inline-block; letter-spacing:1px; font-size:14px;">🔄 REINTENTAR PROCESAMIENTO</a>
                 </div>
-                <p style="color:#475569; font-size:13px; text-align:center;">Al hacer clic, el sistema volverá a procesar el lead y recibirás los correos normales.</p>
+                <p style="color:#475569; font-size:13px; text-align:center;">Al hacer clic, el sistema volverá a intentarlo usando este ID.</p>
             `,
             safeName, safeEmail, safePhone, score: data.score, level: escapeHtml(data.level),
             isInternal: true,
@@ -370,7 +381,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
             To: process.env.POSTMARK_INTERNAL_EMAIL,
             ReplyTo: safeEmail,
             MessageStream: "outbound",
-            Subject: `⚠️ ALERTA IA - Lead Rescatado: ${safeName}`,
+            Subject: `⚠️ ERROR IA - Lead Rescatado: ${safeName}`,
             HtmlBody: fallbackHtml
         };
 
@@ -410,7 +421,7 @@ export default async function handler(req, res) {
       const clientToken = req.query.token || '';
       
       // La validación se hace contra la llave exclusiva del backend
-      const serverToken = process.env.RETRY_SECRET || process.env.API_SECRET;
+      const serverToken = process.env.RETRY_SECRET || process.env.API_SECRET || '';
 
       // Validación criptográfica estricta
       if (clientToken.length !== serverToken.length || !crypto.timingSafeEqual(Buffer.from(clientToken), Buffer.from(serverToken))) {
@@ -437,9 +448,9 @@ export default async function handler(req, res) {
 
           return res.status(200).send(`
             <div style="font-family:sans-serif; text-align:center; margin-top:100px; color:#1a3a6e;">
-              <h1 style="font-size:40px;">✅ ¡Reintento Exitoso!</h1>
-              <p style="font-size:18px; color:#475569;">La Inteligencia Artificial ha procesado el lead de <b>${escapeHtml(leadData.name)}</b>.</p>
-              <p style="font-size:18px; color:#475569;">Por favor, cierra esta ventana y revisa tu bandeja de entrada.</p>
+              <h1 style="font-size:40px;">✅ ¡Reintento Procesado!</h1>
+              <p style="font-size:18px; color:#475569;">El servidor ha intentado reprocesar el lead de <b>${escapeHtml(leadData.name)}</b>.</p>
+              <p style="font-size:18px; color:#475569;">Por favor, cierra esta ventana y verifica si el correo llegó a tu bandeja.</p>
             </div>
           `);
 
