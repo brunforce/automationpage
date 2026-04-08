@@ -232,7 +232,8 @@ function generarHtmlCorreo({
 // ==========================================
 // FUNCIÓN AUXILIAR: PROCESAMIENTO IA Y POSTMARK
 // ==========================================
-async function procesarIAyCorreo(data, dbKey) {
+// Se agrega "reqHost" para construir dinámicamente la URL de reintento manual
+async function procesarIAyCorreo(data, dbKey, reqHost) {
   const db = admin.database();
   try {
     const promptPath = path.join(process.cwd(), 'api', 'prompt.txt');
@@ -265,7 +266,7 @@ async function procesarIAyCorreo(data, dbKey) {
     const textoCorreoCliente = matchEmail ? matchEmail[1].trim() : "No se generó correctamente el bloque para el cliente.";
     const textoAnalisisInterno = matchInterno ? matchInterno[1].trim() : analisisCrudo; 
 
-    // Escapamos los datos solo al inyectarlos en HTML (Previene XSS sin corromper la BD)
+    // Escapamos los datos solo al inyectarlos en HTML
     const safeName = escapeHtml(data.name);
     const safeEmail = escapeHtml(data.email);
     const safePhone = escapeHtml(data.phone);
@@ -328,12 +329,64 @@ async function procesarIAyCorreo(data, dbKey) {
 
   } catch (error) {
     console.error("Error en procesamiento secundario:", error);
-    // Reportamos el error silencioso a la base de datos
     await db.ref(`respuestas_bcmex/${dbKey}`).update({ procesado: 'error_email' });
+
+    // ==============================================================
+    // PLAN B: ALERTA DE RESCATE (WEBHOOK MANUAL POR CORREO)
+    // ==============================================================
+    try {
+        const safeName = escapeHtml(data.name);
+        const safeEmail = escapeHtml(data.email);
+        const safePhone = escapeHtml(data.phone);
+        
+        // Creamos la URL segura de reintento usando una LLAVE PRIVADA EXCLUSIVA para el backend
+        const host = reqHost || 'bcpscore.vercel.app';
+        
+        // Exigimos RETRY_SECRET. Si no existe, usamos API_SECRET temporalmente para que no se rompa hoy.
+        const retrySecret = process.env.RETRY_SECRET || process.env.API_SECRET; 
+        const retryUrl = `https://${host}/api/guardar-lead?action=retry&leadId=${dbKey}&token=${retrySecret}`;
+
+        const fallbackHtml = generarHtmlCorreo({
+            tituloHTML: "Alerta de Fallo en IA<br><strong style=\"font-weight:700;\">Datos Rescatados</strong>",
+            subtitulo: "ACCIÓN MANUAL REQUERIDA",
+            tituloSeccion: "Datos Crudos del Prospecto",
+            contenidoHTML: `
+                <div style="background-color:#fee2e2; border:1px solid #f87171; border-radius:6px; padding:16px; margin-bottom:20px;">
+                    <p style="color:#b91c1c; font-weight:bold; margin:0 0 8px 0;">⚠️ La Inteligencia Artificial falló por saturación del servidor.</p>
+                    <p style="color:#7f1d1d; font-size:13px; margin:0;">¡Pero no perdimos al prospecto! Sus datos están seguros en la base de datos.</p>
+                </div>
+                <div style="text-align:center; padding:20px 0;">
+                    <a href="${retryUrl}" style="background-color:#1a3a6e; color:#ffffff; padding:14px 28px; text-decoration:none; border-radius:6px; font-weight:bold; display:inline-block; letter-spacing:1px; font-size:14px;">🔄 REINTENTAR ANÁLISIS CON IA</a>
+                </div>
+                <p style="color:#475569; font-size:13px; text-align:center;">Al hacer clic, el sistema volverá a procesar el lead y recibirás los correos normales.</p>
+            `,
+            safeName, safeEmail, safePhone, score: data.score, level: escapeHtml(data.level),
+            isInternal: true,
+            respuestas: data.answers 
+        });
+
+        const fallbackPayload = {
+            From: process.env.POSTMARK_FROM_EMAIL,
+            To: process.env.POSTMARK_INTERNAL_EMAIL,
+            ReplyTo: safeEmail,
+            MessageStream: "outbound",
+            Subject: `⚠️ ALERTA IA - Lead Rescatado: ${safeName}`,
+            HtmlBody: fallbackHtml
+        };
+
+        await fetch("https://api.postmarkapp.com/email", {
+            method: 'POST',
+            headers: { "Accept": "application/json", "Content-Type": "application/json", "X-Postmark-Server-Token": process.env.POSTMARK_TOKEN },
+            body: JSON.stringify(fallbackPayload)
+        });
+        console.log("Correo de rescate enviado con éxito.");
+    } catch (fallbackErr) {
+        console.error("Fallo crítico: No se pudo enviar el correo de rescate.", fallbackErr);
+    }
   }
 }
 
-// Inicialización de Firebase (fuera del handler si es posible, pero seguro aquí)
+// Inicialización de Firebase
 if (!admin.apps.length && process.env.FIREBASE_DATABASE_URL) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -349,37 +402,91 @@ if (!admin.apps.length && process.env.FIREBASE_DATABASE_URL) {
 // FUNCIÓN PRINCIPAL DEL SERVIDOR (HANDLER)
 // ==========================================
 export default async function handler(req, res) {
-  const payloadString = JSON.stringify(req.body || {});
+
+  // ======================================================================
+  // NUEVA RUTA 'GET': REINTENTO MANUAL (Webhook Seguro mediante Clic)
+  // ======================================================================
+  if (req.method === 'GET' && req.query.action === 'retry') {
+      const clientToken = req.query.token || '';
+      
+      // La validación se hace contra la llave exclusiva del backend
+      const serverToken = process.env.RETRY_SECRET || process.env.API_SECRET;
+
+      // Validación criptográfica estricta
+      if (clientToken.length !== serverToken.length || !crypto.timingSafeEqual(Buffer.from(clientToken), Buffer.from(serverToken))) {
+          return res.status(401).send('<h1 style="color:red; text-align:center; margin-top:50px;">⛔ Acceso Denegado. Credencial inválida.</h1>');
+      }
+
+      const leadId = req.query.leadId;
+      if (!leadId || typeof leadId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(leadId)) {
+          return res.status(400).send('<h1 style="color:red; text-align:center; margin-top:50px;">❌ ID de lead inválido.</h1>');
+      }
+
+      try {
+          const db = admin.database();
+          const leadSnapshot = await db.ref(`respuestas_bcmex/${leadId}`).once('value');
+          
+          if (!leadSnapshot.exists()) {
+              return res.status(404).send('<h1 style="color:red; text-align:center; margin-top:50px;">🔍 Lead no encontrado en la base de datos.</h1>');
+          }
+
+          const leadData = leadSnapshot.val();
+          
+          // Enviamos una respuesta HTML bonita e iniciamos el reprocesamiento (con await para garantizar envío)
+          await procesarIAyCorreo(leadData, leadId, req.headers.host);
+
+          return res.status(200).send(`
+            <div style="font-family:sans-serif; text-align:center; margin-top:100px; color:#1a3a6e;">
+              <h1 style="font-size:40px;">✅ ¡Reintento Exitoso!</h1>
+              <p style="font-size:18px; color:#475569;">La Inteligencia Artificial ha procesado el lead de <b>${escapeHtml(leadData.name)}</b>.</p>
+              <p style="font-size:18px; color:#475569;">Por favor, cierra esta ventana y revisa tu bandeja de entrada.</p>
+            </div>
+          `);
+
+      } catch (err) {
+          console.error(err);
+          return res.status(500).send('<h1 style="color:red; text-align:center; margin-top:50px;">💥 Ocurrió un error en el servidor al intentar reprocesar.</h1>');
+      }
+  }
+
+
+  // ======================================================================
+  // RUTA 'POST': FLUJO NORMAL (Protecciones de Seguridad Originales)
+  // ======================================================================
+  
+  // Límite de tamaño de Payload
+  const payloadString = req.body ? JSON.stringify(req.body) : '';
   if (Buffer.byteLength(payloadString, 'utf8') > 50000) {
     return res.status(413).json({ error: 'Payload Too Large' });
   }
 
   const origin = req.headers.origin;
   
-  // CORS Bypass fix: Requiere validación estricta de orígenes
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', (origin && ALLOWED_ORIGINS.includes(origin)) ? origin : ALLOWED_ORIGINS[0]);
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, version');
     return res.status(200).end();
   }
 
-  if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
-    return res.status(403).json({ error: 'Acceso denegado. Origen no permitido.' });
+  // Se permite bloquear POSTs sin origin legítimo
+  if (req.method !== 'GET') {
+      if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
+        return res.status(403).json({ error: 'Acceso denegado. Origen no permitido.' });
+      }
+      res.setHeader('Access-Control-Allow-Origin', origin);
   }
-
-  res.setHeader('Access-Control-Allow-Origin', origin);
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
-  // Anti-Timing Attacks para el Token
+  // Validación de Token para POST (Frontend)
   const clientToken = req.headers['version'] || '';
   const serverToken = process.env.API_SECRET || '';
   if (clientToken.length !== serverToken.length || !crypto.timingSafeEqual(Buffer.from(clientToken), Buffer.from(serverToken))) {
     return res.status(401).json({ error: 'No autorizado. Token inválido o ausente.' });
   }
 
-  // Rate Limiting seguro contra IP Spoofing de Vercel
+  // Rate Limiting
   const clientIp = req.headers['x-vercel-forwarded-for'] || 'ip-desconocida';
   const currentTime = Date.now();
 
@@ -395,7 +502,7 @@ export default async function handler(req, res) {
     ipCache.set(clientIp, { count: 1, startTime: currentTime });
   }
 
-  // Limpieza Inteligente del Caché (No borra todo, solo los expirados)
+  // Limpieza de caché
   if (ipCache.size > 1000) {
     for (const [key, val] of ipCache.entries()) {
       if (currentTime - val.startTime >= RATE_LIMIT_WINDOW_MS) ipCache.delete(key);
@@ -414,7 +521,7 @@ export default async function handler(req, res) {
 
     // FASE 1: CREAR LEAD
     if (data.action === 'create') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Validación de correo estricta
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!data.email || typeof data.email !== 'string' || !emailRegex.test(data.email)) {
             return res.status(400).json({ error: 'Correo electrónico inválido' });
         }
@@ -422,7 +529,6 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Nombre inválido' });
         }
 
-        // Se guarda crudo, el escape se hace en HTML
         const rawData = {
             name: data.name.trim().substring(0, 80),
             email: data.email.trim().toLowerCase().substring(0, 100),
@@ -440,7 +546,6 @@ export default async function handler(req, res) {
 
     // FASE 2: ACTUALIZAR Y PROCESAR
     else if (data.action === 'update') {
-        // Prevención de Path Traversal
         if (!data.leadId || typeof data.leadId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(data.leadId)) {
             return res.status(400).json({ error: 'Falta ID de lead o es inválido' });
         }
@@ -490,8 +595,8 @@ export default async function handler(req, res) {
             answers: rawAnswers
         };
 
-        // Esperar el procesamiento de IA y Correos
-        await procesarIAyCorreo(mergedData, data.leadId);
+        // Pasamos req.headers.host para saber qué dominio usar en el botón de rescate
+        await procesarIAyCorreo(mergedData, data.leadId, req.headers.host);
 
         return res.status(200).json({ success: true, message: 'Lead completado y procesado' });
     } 
