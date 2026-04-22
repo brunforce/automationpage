@@ -10,8 +10,7 @@ const crypto = require('crypto'); // Módulo nativo para evitar Timing Attacks
 
 const ALLOWED_ORIGINS = [
   'https://bcpscore.vercel.app',
-  'https://bcpscore2.vercel.app',
-  'http://localhost:3000'
+  'https://bcpscore2.vercel.app'
 ];
 
 const VALID_LEVELS = ['Crítico', 'En Desarrollo', 'Madurez Alta'];
@@ -351,10 +350,11 @@ async function procesarIAyCorreo(data, dbKey, reqHost, modelName = "gemini-2.5-f
         
         // Creamos la URL segura y CODIFICAMOS el token para evitar que el símbolo '#' lo rompa
         const host = reqHost || 'bcpscore.vercel.app';
-        const retrySecret = process.env.RETRY_SECRET || process.env.API_SECRET || ''; 
+        const retrySecret = process.env.RETRY_SECRET || process.env.API_SECRET || '';
         const encodedToken = encodeURIComponent(retrySecret); // ← ¡AQUÍ ESTÁ LA MAGIA PARA EL SIMBOLO #!
-        
-        const retryUrl = `https://${host}/api/guardar-lead?action=retry&leadId=${dbKey}&token=${encodedToken}`;
+        const protocol = host.startsWith('localhost') ? 'http' : 'https';
+
+        const retryUrl = `${protocol}://${host}/api/guardar-lead?action=retry&leadId=${dbKey}&token=${encodedToken}`;
 
         const fallbackHtml = generarHtmlCorreo({
             tituloHTML: "Alerta de Fallo en Procesamiento<br><strong style=\"font-weight:700;\">Datos Rescatados</strong>",
@@ -445,7 +445,7 @@ export default async function handler(req, res) {
           const leadData = leadSnapshot.val();
           
           // Enviamos una respuesta HTML bonita e iniciamos el reprocesamiento (con await para garantizar envío)
-          await procesarIAyCorreo(leadData, leadId, req.headers.host, "gemini-3.1-flash-lite-preview");
+          await procesarIAyCorreo(leadData, leadId, req.headers.host, "gemini-3-flash-preview");
 
           return res.status(200).send(`
             <div style="font-family:sans-serif; text-align:center; margin-top:100px; color:#1a3a6e;">
@@ -621,4 +621,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Error interno al procesar' });
   }
 }
- 
