@@ -234,7 +234,7 @@ function generarHtmlCorreo({
 // FUNCIÓN AUXILIAR: PROCESAMIENTO IA Y POSTMARK
 // ==========================================
 // Se agrega "reqHost" para construir dinámicamente la URL de reintento manual
-async function procesarIAyCorreo(data, dbKey, reqHost) {
+async function procesarIAyCorreo(data, dbKey, reqHost, modelName = "gemini-2.5-flash-lite") {
   const db = admin.database();
   try {
     const promptPath = path.join(process.cwd(), 'api', 'prompt.txt');
@@ -257,7 +257,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
     if (!process.env.GEMINI_API_KEY) throw new Error("Falta la variable de entorno GEMINI_API_KEY en Vercel.");
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+    const model = genAI.getGenerativeModel({ model: modelName });
     const result = await model.generateContent(promptText);
     const analisisCrudo = result.response.text().trim();
 
@@ -445,7 +445,7 @@ export default async function handler(req, res) {
           const leadData = leadSnapshot.val();
           
           // Enviamos una respuesta HTML bonita e iniciamos el reprocesamiento (con await para garantizar envío)
-          await procesarIAyCorreo(leadData, leadId, req.headers.host);
+          await procesarIAyCorreo(leadData, leadId, req.headers.host, "gemini-3.1-flash-lite-preview");
 
           return res.status(200).send(`
             <div style="font-family:sans-serif; text-align:center; margin-top:100px; color:#1a3a6e;">
@@ -621,3 +621,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Error interno al procesar' });
   }
 }
+ 
