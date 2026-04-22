@@ -10,7 +10,8 @@ const crypto = require('crypto'); // Módulo nativo para evitar Timing Attacks
 
 const ALLOWED_ORIGINS = [
   'https://bcpscore.vercel.app',
-  'https://bcpscore2.vercel.app'
+  'https://bcpscore2.vercel.app',
+  'http://localhost:3000'
 ];
 
 const VALID_LEVELS = ['Crítico', 'En Desarrollo', 'Madurez Alta'];
@@ -256,7 +257,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost) {
     if (!process.env.GEMINI_API_KEY) throw new Error("Falta la variable de entorno GEMINI_API_KEY en Vercel.");
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
     const result = await model.generateContent(promptText);
     const analisisCrudo = result.response.text().trim();
 

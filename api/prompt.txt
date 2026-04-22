@@ -43,7 +43,7 @@ Redacta el correo para el cliente manteniendo la redacción concisa, evitando re
 
 ESTRUCTURA ESPERADA:
 
-Introducción: Saludo inicial de 1-2 líneas máximo utilizando EXACTAMENTE el nombre proporcionado en DATOS DEL PROSPECTO. Sin saludos excesivos.
+Introducción: Saludo inicial de 1-3 líneas máximo utilizando EXACTAMENTE el nombre proporcionado en DATOS DEL PROSPECTO. Sin saludos excesivos.
 
 Sección "Urgente": Viñetas (bullet points) enfocadas en las ÁREAS DE MEJORA más críticas. Por cada punto, expón directamente el problema actual detectado y la mejora inmediata requerida.
 
