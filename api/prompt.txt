@@ -77,7 +77,7 @@ Arista 3 (Fórmula Problema-Mejora-Solución): Impregna un sentido de ventas en 
 INSTRUCCIONES PARTE 2: ANÁLISIS EN CRUDO (INTERNO PARA BCMEX)
 Escribe un análisis honesto, directo y sin filtros dirigido al equipo comercial de BCMEX sobre la viabilidad de este prospecto. Estructura este análisis utilizando viñetas que cubran obligatoriamente los siguientes puntos:
 
-Evaluación y Viabilidad: Determina la calidad del lead (Altamente Calificado, Viable, Potencial o Baja Prioridad) cruzando sus respuestas de perfil (tamaño, sitios, sistemas) vs sus respuestas de dolor (manualidad, dependencia, incidentes, baja observabilidad) y de prioridad (intención, iniciativas activas, área decisora).
+Evaluación y Viabilidad: Determina el nivel de madurez del prospecto (Automatización Consolidada, Automatización en Crecimiento, Automatización Potencial o Etapa Exploratoria) cruzando sus respuestas de perfil (tamaño, sitios, sistemas) vs sus respuestas de dolor (manualidad, dependencia, incidentes, baja observabilidad) y de prioridad (intención, iniciativas activas, área decisora).
 
 Áreas de Mejora (Foco Comercial): Enumera directamente los puntos de mejora acordes a sus problemas actuales. Qué está fallando hoy, qué casos de uso de Control-M aplican (orquestación batch, integración ERP-MES, file transfer, observabilidad operativa) y qué optimizaciones se le deben vender.
 

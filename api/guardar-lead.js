@@ -12,7 +12,7 @@ const ALLOWED_ORIGINS = [
   'https://automationpage.vercel.app'
 ];
 
-const VALID_LEVELS = ['Lead Calificado', 'Lead Viable', 'Lead Potencial', 'Baja Prioridad'];
+const VALID_LEVELS = ['Automatización Consolidada', 'Automatización en Crecimiento', 'Automatización Potencial', 'Etapa Exploratoria'];
 const MAX_ANSWERS = 30;
 const MAX_LABEL_LENGTH = 300;
 const SCORE_MIN = 0;

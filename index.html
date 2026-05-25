@@ -832,33 +832,33 @@
             circle.classList.remove('text-red-600', 'text-orange-500', 'text-green-500', 'text-blue-600');
 
             if (score >= 80) {
-                currentRiskLevel = 'Lead Calificado';
+                currentRiskLevel = 'Automatización Consolidada';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700";
-                badge.textContent = "Lead Altamente Calificado";
+                badge.textContent = "Automatización Consolidada";
                 circle.classList.add('text-green-500');
-                desc.textContent = "Dolor claro, procesos críticos, baja observabilidad y prioridad alta. Candidato para contacto comercial inmediato.";
-                pitch.textContent = "BCMEX puede orquestar y dar observabilidad a sus procesos críticos con Control-M en pocas semanas.";
+                desc.textContent = "Su operación muestra procesos críticos bien identificados, alta dependencia tecnológica gestionada y una cultura clara de continuidad. Está en el nivel donde la siguiente conversación es de optimización fina y escalamiento.";
+                pitch.textContent = "BCMEX puede ayudarle a llevar su orquestación al siguiente nivel: visibilidad end-to-end, automatización avanzada y gobierno proactivo de procesos críticos.";
             } else if (score >= 60) {
-                currentRiskLevel = 'Lead Viable';
+                currentRiskLevel = 'Automatización en Crecimiento';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700";
-                badge.textContent = "Lead Viable";
+                badge.textContent = "Automatización en Crecimiento";
                 circle.classList.add('text-blue-600');
-                desc.textContent = "Oportunidad real que requiere un discovery o workshop de diagnóstico. Nurturing corto y seguimiento.";
-                pitch.textContent = "Un workshop de diagnóstico BCMEX traduce su realidad operativa en un roadmap de automatización accionable.";
+                desc.textContent = "Su operación tiene fundamentos sólidos y procesos críticos identificados. Hay áreas concretas donde la orquestación y la observabilidad pueden reducir fricción y acelerar la recuperación ante fallas.";
+                pitch.textContent = "Un workshop de diagnóstico con BCMEX traduce su realidad actual en un roadmap accionable de automatización y visibilidad.";
             } else if (score >= 40) {
-                currentRiskLevel = 'Lead Potencial';
+                currentRiskLevel = 'Automatización Potencial';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700";
-                badge.textContent = "Lead Potencial";
+                badge.textContent = "Automatización Potencial";
                 circle.classList.add('text-orange-500');
-                desc.textContent = "Existe necesidad, pero aún no es suficientemente madura. Conviene nutrir con contenido y recontactar.";
-                pitch.textContent = "BCMEX le ayuda a estructurar el caso de negocio antes de invertir en una plataforma de orquestación.";
+                desc.textContent = "Su operación tiene espacios claros donde la automatización y la observabilidad pueden generar valor inmediato. La oportunidad existe; vale la pena estructurar el caso de negocio antes de invertir.";
+                pitch.textContent = "BCMEX le acompaña a priorizar dónde empezar, con un análisis enfocado en el retorno operativo más rápido para su realidad.";
             } else {
-                currentRiskLevel = 'Baja Prioridad';
+                currentRiskLevel = 'Etapa Exploratoria';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-slate-100 text-slate-700";
-                badge.textContent = "Baja Prioridad";
-                circle.classList.add('text-red-600');
-                desc.textContent = "Baja complejidad, bajo dolor o baja urgencia. No prioritario para inversión comercial directa por ahora.";
-                pitch.textContent = "Cuando su operación escale y dependa de más integraciones, BCMEX estará listo para acompañarle.";
+                badge.textContent = "Etapa Exploratoria";
+                circle.classList.add('text-slate-600');
+                desc.textContent = "Su operación está en una fase donde los procesos críticos todavía se están construyendo o no dependen pesadamente de integraciones complejas. Es una posición ideal para diseñar desde cero con principios de automatización y observabilidad.";
+                pitch.textContent = "Cuando su operación crezca y la complejidad lo justifique, BCMEX estará listo para acompañarle desde el primer proceso crítico.";
             }
         }
 
