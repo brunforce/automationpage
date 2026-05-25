@@ -293,7 +293,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost, modelName = "gemini-2.5-f
       To: toEmail,
       ReplyTo: safeEmail, 
       MessageStream: "outbound",
-      Subject: `[BORRADOR] Correo para Cliente - BCP: ${safeName}`,
+      Subject: `[BORRADOR] Correo para Cliente - Automation: ${safeName}`,
       HtmlBody: generarHtmlCorreo({
           tituloHTML: "Borrador de<br><strong style=\"font-weight:700;\">Correo para Cliente</strong>",
           subtitulo: "Revisión Humana Requerida",
@@ -309,7 +309,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost, modelName = "gemini-2.5-f
       To: toEmail,
       ReplyTo: safeEmail,
       MessageStream: "outbound",
-      Subject: `🔥 NUEVO LEAD BCP (Análisis Interno): ${safeName}`,
+      Subject: `LEAD POTENCIAL (Automation): ${safeName}`,
       HtmlBody: generarHtmlCorreo({
           tituloHTML: "Análisis Interno de<br><strong style=\"font-weight:700;\">Resiliencia Empresarial</strong>",
           subtitulo: "Informe Confidencial (No compartir)",
