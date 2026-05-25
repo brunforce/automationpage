@@ -1,7 +1,7 @@
 <html lang="es"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>BCMEX - Diagnóstico y Reporte BCP</title>
+<title>BCMEX - Automation &amp; Observability Score</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
@@ -28,7 +28,7 @@
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .scale-in { animation: scaleIn 0.2s ease-out; }
-        
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -44,12 +44,12 @@
             body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible !important; height: auto !important; }
             nav, button, .no-print, #hero-section, #wizard-section, #loading-section, #start-modal, #phone-modal { display: none !important; }
             #app-container { margin: 0; padding: 0; height: auto; overflow: visible; }
-            #results-section { 
-                position: relative !important; 
-                display: block !important; 
-                inset: auto !important; 
-                height: auto !important; 
-                overflow: visible !important; 
+            #results-section {
+                position: relative !important;
+                display: block !important;
+                inset: auto !important;
+                height: auto !important;
+                overflow: visible !important;
                 background: white;
             }
             .print-break-inside { break-inside: avoid; }
@@ -64,7 +64,7 @@
     <div class="flex items-center gap-3 cursor-pointer overflow-visible" onclick="resetApp()">
         <img class="h-20 w-auto object-contain transform scale-[1.8] origin-left md:scale-[2.5] transition-all" src="logo1.png" alt="Logo BCMEX" onerror="this.src='https://placehold.co/120x40?text=Logo'">
     </div>
-    
+
     <div class="relative">
         <button onclick="toggleContactMenu()" id="btn-contact" class="bg-[#0ea5e9] hover:bg-[#0284c7] text-white px-6 py-2.5 rounded-full text-sm font-bold transition shadow-md flex items-center gap-2">
             <span>Contáctanos</span>
@@ -109,14 +109,14 @@
     </div>
     <div class="relative z-20 max-w-5xl text-center px-6 flex flex-col items-center">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight slide-up drop-shadow-lg">
-            ¿Qué tan resiliente es tu<br class="hidden md:block"> negocio ante el caos?
+            ¿Qué tan automatizada y visible<br class="hidden md:block"> es tu operación crítica?
         </h1>
         <div class="w-full max-w-2xl h-0.5 bg-blue-500 rounded-full mb-8 opacity-80 slide-up" style="animation-delay: 0.1s;"></div>
         <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 slide-up drop-shadow-md italic" style="animation-delay: 0.2s;">
-            Obtén tu puntaje de BCP en solo 2 minutos.
+            Obtén tu Automation &amp; Observability Score en 3 minutos.
         </h2>
         <p class="text-lg md:text-xl text-slate-300 mb-12 font-light slide-up drop-shadow-md" style="animation-delay: 0.3s;">
-            Identifica brechas antes de que se conviertan en desastres.
+            Detecta dependencia de scripts, falta de visibilidad e impacto operativo antes de que se vuelvan crisis.
         </p>
         <button class="group relative bg-gradient-to-r from-[#06b6d4] to-[#2563eb] text-white px-10 py-4 rounded-lg font-bold text-lg shadow-xl shadow-blue-900/50 hover:shadow-2xl hover:scale-105 transition-all duration-300 slide-up flex items-center gap-2" onclick="openStartModal()" style="animation-delay: 0.4s;">
             <span>Iniciar Diagnóstico</span>
@@ -134,7 +134,7 @@
             <h3 class="text-2xl font-bold text-slate-900">Tus Datos</h3>
         </div>
         <p class="text-slate-500 mb-6 text-sm">Ingresa tu información para personalizar el diagnóstico.</p>
-        
+
         <div class="space-y-4 mb-6" onkeypress="handleStartFormKeypress(event)">
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Nombre Completo *</label>
@@ -170,9 +170,9 @@
         </div>
         <h3 class="text-2xl font-bold text-slate-900 mb-2"> </h3>
         <p class="text-slate-500 mb-6 text-sm px-4">Ingresa tu número telefónico con código de país (ej. +52) para validar y procesar de manera profesional.</p>
-        
+
         <input type="tel" id="user-phone-input" maxlength="15" placeholder="+521122334455" class="w-full px-5 py-4 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition mb-6 text-lg font-medium text-slate-700 text-center tracking-wide">
-        
+
         <button id="btn-submit-phone" onclick="submitWithPhone()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-200 flex items-center justify-center gap-2 mb-4 group">
             Obtener Resultados <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
@@ -190,10 +190,10 @@
     <button class="text-slate-400 hover:text-red-500 transition flex items-center justify-center" onclick="resetApp()" title="Salir del diagnóstico">
         <span class="material-symbols-outlined">close</span>
     </button>
-    
+
     <!-- Contador de progreso -->
     <div class="border-l border-slate-200 pl-4 ml-1">
-        <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Pregunta <span id="current-step-num">1</span> de <span id="total-steps">15</span></span>
+        <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Pregunta <span id="current-step-num">1</span> de <span id="total-steps">16</span></span>
         <div class="h-1.5 w-32 md:w-48 bg-slate-100 rounded-full mt-1 overflow-hidden">
             <div class="h-full bg-blue-600 transition-all duration-500 w-0" id="progress-bar"></div>
         </div>
@@ -219,7 +219,7 @@
 <span class="material-symbols-outlined absolute inset-0 flex items-center justify-center text-blue-600 text-3xl">smart_toy</span>
 </div>
 <h2 class="text-2xl font-bold text-slate-900 mb-2">Analizando sus respuestas...</h2>
-<p class="text-slate-500 max-w-md mx-auto mb-8" id="loading-text">Calculando puntaje de resiliencia...</p>
+<p class="text-slate-500 max-w-md mx-auto mb-8" id="loading-text">Calculando su Automation &amp; Observability Score...</p>
 <div class="bg-blue-50 border border-blue-100 p-6 rounded-xl max-w-lg w-full text-left">
 <div class="flex items-start gap-3">
 <span class="material-symbols-outlined text-blue-600 mt-1">lightbulb</span>
@@ -237,7 +237,7 @@
 <img class="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay print-header-image" src="background1.png" onerror="this.src='https://images.unsplash.com/photo-1558494949-efc535b5fa12?q=80&w=2070'">
 <div class="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
 <div>
-<h2 class="text-3xl font-bold mb-2">Diagnóstico de Madurez BCP</h2>
+<h2 class="text-3xl font-bold mb-2">Control-M Automation &amp; Observability Score</h2>
 <p class="text-slate-400">Generado el <span id="current-date"></span> para <span id="display-user-name" class="font-semibold text-blue-400">su empresa</span></p>
 </div>
 </div>
@@ -249,7 +249,7 @@
         <div class="flex-1 w-full bg-white rounded-2xl shadow-lg border border-slate-100 p-8 text-center print-break-inside">
             <div>
                 <h3 class="text-slate-500 font-medium text-sm uppercase tracking-wider mb-6">Puntaje Acumulado</h3>
-                
+
                 <div class="relative w-48 h-48 mx-auto mb-6">
                     <svg class="w-full h-full transform -rotate-90">
                         <circle cx="96" cy="96" fill="transparent" r="88" stroke="#f1f5f9" stroke-width="12"></circle>
@@ -257,7 +257,7 @@
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
                         <span class="text-5xl font-bold text-slate-900" id="final-score">0</span>
-                        <span class="text-xs text-slate-400 mt-1">/ <span id="max-possible-score">50</span> Puntos</span>
+                        <span class="text-xs text-slate-400 mt-1">/ <span id="max-possible-score">100</span> Puntos</span>
                     </div>
                 </div>
 
@@ -265,7 +265,7 @@
                     <span class="px-4 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700" id="score-badge">Calculando...</span>
                 </div>
                 <p class="text-slate-600 text-sm leading-relaxed mb-8 max-w-lg mx-auto" id="score-description"></p>
-                
+
                 <!-- Caja de Acción para enviar resultados -->
                 <div class="bg-blue-50 rounded-xl p-6 border border-blue-100 mt-8 text-left no-print" id="send-action-box">
                     <h4 class="text-lg font-bold text-slate-800 mb-2">¿Quieres ver los detalles de esta evaluación?</h4>
@@ -311,7 +311,7 @@
                 </a>
             </div>
         </div>
-    </div> 
+    </div>
 
     <div class="mt-12 text-center no-print">
         <p class="text-sm text-slate-400">© 2026 BCMEX Solutions. Todos los derechos reservados.</p>
@@ -323,51 +323,168 @@
 <script>
         // CONFIGURACIÓN DE SEGURIDAD PARA MATCH CON BACKEND
         const SECURITY_CONFIG = {
-            API_TOKEN: "gX9#mK2$pL7qRt4vNw" 
+            API_TOKEN: "gX9#mK2$pL7qRt4vNw"
         };
 
-        const prospectingQuestions = [
-            { id: 'p1_market', text: "¿Cual describe mejor el alcance actual de su empresa dentro de su mercado principal?", type: 'standard', options: [{ label: "Atendemos principalmente clientes locales o de una zona especifica", val: 1 }, { label: "Vendemos en varios estados o regiones del pais, pero no con cobertura nacional completa", val: 2 }, { label: "Tenemos presencia comercial relevante a nivel nacional en nuestro nicho o industria", val: 3 }, { label: "Ademas de presencia nacional , atendemos clientes internacionales o exportamos regularmente", val: 4 }] },
-            { id: 'p2_employees', text: "¿Cuántas personas participan directamente en la operación diaria del negocio?", type: 'standard', options: [{ label: "Menos de 10", val: 1 }, { label: "10 - 50", val: 2 }, { label: "51 - 200", val: 3 }, { label: "201 - 500", val: 4 }, { label: "Mas de 500", val: 5 }] },
-            { id: 'p3_dependency', text: "¿Qué tan dependiente es su operación de sistemas digitales para generar ingresos?", type: 'standard', options: [{ label: "Baja, podríamos operar manualmente", val: 1 }, { label: "Media, alta productividad", val: 2 }, { label: "Alta, la operación se detiene", val: 3 }, { label: "Critica, el negocio no puede operar sin sistemas", val: 4 }] },
-            { id: 'p4_systems', text: "¿Cuántos sistemas o aplicaciones son críticos para la operación diaria?", type: 'standard', options: [{ label: "1-2", val: 1 }, { label: "3-5", val: 2 }, { label: "6-10", val: 3 }, { label: "Mas de 10", val: 4 }] },
-            { id: 'p5_impact', text: "Una interrupción tecnológica impactaría principalmente en:", type: 'standard', options: [{ label: "Operación interna", val: 1 }, { label: "Clientes finales", val: 2 }, { label: "Socios/Proveedores", val: 3 }, { label: "Clientes, ingreso y reputación", val: 4 }] },
-            { id: 'p6_team', text: "¿Existe un equipo o área responsable de continuidad, riesgos o tecnología?", type: 'standard', options: [{ label: "No", val: 1 }, { label: "Se asigna de forma informal", val: 2 }, { label: "Si, Pero con recursos limitados", val: 3 }, { label: "Si, con responsables definidos", val: 4 }] }
+        // ===========================================================
+        //  CONTROL-M AUTOMATION & OBSERVABILITY SCORE
+        //  16 preguntas en 6 bloques. Puntaje total: 100.
+        //  Tipos: 'standard' (radio), 'multi' (selección múltiple), 'open' (texto).
+        //  Distribución del puntaje:
+        //    Bloque 1 - Perfil operativo: 25 pts (b1_size 8 + b1_sites 7 + b1_systems 10)
+        //    Bloque 2 - Automatización:   30 pts (b2_execution 10 + b2_dependency 10 + b2_pains 10)
+        //    Bloque 3 + 4 - Observabilidad y criticidad: 30 pts
+        //         (b3_visibility 6 + b3_mttr 6 + b4_impact 8 + b4_critical 6 + b4_incidents 4)
+        //    Bloque 5 - Prioridad y viabilidad: 15 pts
+        //         (b5_priority 6 + b5_initiatives 5 + b5_buyer 4)
+        //    Bloque 6 - Preguntas abiertas (b6_challenge, b6_oneprocess): 0 pts (insumo IA)
+        // ===========================================================
+        const diagnosticQuestions = [
+            // --- Bloque 1. Perfil operativo ---
+            { id: 'b1_size', block: 'Perfil operativo', text: '¿Cuál es el tamaño aproximado de su operación en México?', type: 'standard', maxPts: 8, options: [
+                { label: '50 a 99 empleados', val: 1 },
+                { label: '100 a 250 empleados', val: 3 },
+                { label: '251 a 500 empleados', val: 5 },
+                { label: '501 a 1,000 empleados', val: 7 },
+                { label: 'Más de 1,000 empleados', val: 8 }
+            ]},
+            { id: 'b1_sites', block: 'Perfil operativo', text: '¿Cuántas plantas, centros de distribución o sitios operativos tiene su empresa?', type: 'standard', maxPts: 7, options: [
+                { label: '1', val: 1 },
+                { label: '2 a 3', val: 3 },
+                { label: '4 a 6', val: 5 },
+                { label: 'Más de 6', val: 7 }
+            ]},
+            { id: 'b1_systems', block: 'Perfil operativo', text: '¿Qué sistemas utiliza hoy para soportar su operación crítica?', type: 'multi', maxPts: 10, options: [
+                { label: 'ERP (SAP, Oracle, Dynamics, etc.)', val: 2 },
+                { label: 'MES', val: 2 },
+                { label: 'WMS', val: 2 },
+                { label: 'Base de datos / procesos SQL', val: 1 },
+                { label: 'Aplicaciones desarrolladas internamente', val: 1 },
+                { label: 'APIs o integraciones con terceros', val: 1 },
+                { label: 'Archivos / FTP / intercambio de archivos', val: 1 },
+                { label: 'No lo tengo claro', val: 0, exclusive: true }
+            ]},
+
+            // --- Bloque 2. Automatización actual ---
+            { id: 'b2_execution', block: 'Automatización actual', text: '¿Cómo se ejecutan hoy la mayoría de sus procesos operativos críticos entre sistemas?', type: 'standard', maxPts: 10, options: [
+                { label: 'Principalmente manuales', val: 10 },
+                { label: 'Manuales con apoyo de scripts o tareas programadas', val: 8 },
+                { label: 'Automatizados parcialmente en algunas áreas', val: 5 },
+                { label: 'Automatizados en la mayoría de los procesos críticos', val: 2 },
+                { label: 'No lo sé', val: 5 }
+            ]},
+            { id: 'b2_dependency', block: 'Automatización actual', text: '¿Su empresa depende actualmente de scripts, tareas programadas, cron jobs o desarrollos puntuales mantenidos por una o pocas personas?', type: 'standard', maxPts: 10, options: [
+                { label: 'Sí, de forma crítica', val: 10 },
+                { label: 'Sí, en varios procesos', val: 8 },
+                { label: 'Sí, pero en pocos casos', val: 5 },
+                { label: 'No', val: 0 },
+                { label: 'No lo sé', val: 5 }
+            ]},
+            { id: 'b2_pains', block: 'Automatización actual', text: '¿Con qué frecuencia ocurre alguno de estos problemas en sus procesos críticos?', type: 'multi', maxPts: 10, options: [
+                { label: 'Fallas de ejecución', val: 2 },
+                { label: 'Retrasos en la ejecución de procesos críticos', val: 2 },
+                { label: 'Reprocesos manuales', val: 2 },
+                { label: 'Falta de visibilidad sobre qué falló', val: 2 },
+                { label: 'Dependencia de una persona específica', val: 2 },
+                { label: 'Ninguno de los anteriores', val: 0, exclusive: true }
+            ]},
+
+            // --- Bloque 3. Observabilidad y control operativo ---
+            { id: 'b3_visibility', block: 'Observabilidad y control', text: '¿Qué nivel de visibilidad tiene hoy sobre el estado de sus procesos críticos de negocio?', type: 'standard', maxPts: 6, options: [
+                { label: 'Muy baja: solo nos enteramos cuando algo falla', val: 6 },
+                { label: 'Parcial: tenemos visibilidad en algunos procesos', val: 4 },
+                { label: 'Media: existen reportes o monitoreo limitado', val: 2 },
+                { label: 'Alta: tenemos monitoreo centralizado y alertas', val: 0 },
+                { label: 'No lo sé', val: 4 }
+            ]},
+            { id: 'b3_mttr', block: 'Observabilidad y control', text: 'Cuando un proceso crítico falla, ¿qué tan rápido puede su equipo identificar la causa y responder?', type: 'standard', maxPts: 6, options: [
+                { label: 'Normalmente tardamos horas o más', val: 6 },
+                { label: 'Tardamos entre 30 minutos y 2 horas', val: 4 },
+                { label: 'Tardamos menos de 30 minutos', val: 1 },
+                { label: 'Depende mucho de la persona o del proceso', val: 5 },
+                { label: 'No lo sé', val: 4 }
+            ]},
+
+            // --- Bloque 4. Impacto y criticidad ---
+            { id: 'b4_impact', block: 'Impacto y criticidad', text: 'Si uno de sus procesos críticos se detiene durante una hora, ¿qué impacto tendría?', type: 'standard', maxPts: 8, options: [
+                { label: 'Alto: afecta producción, entregas, facturación o servicio al cliente', val: 8 },
+                { label: 'Medio: afecta operación, pero puede resolverse manualmente', val: 5 },
+                { label: 'Bajo: genera molestias menores', val: 2 },
+                { label: 'No lo hemos dimensionado', val: 4 }
+            ]},
+            { id: 'b4_critical', block: 'Impacto y criticidad', text: '¿Cuáles de estos procesos considera críticos para su operación?', type: 'multi', maxPts: 6, options: [
+                { label: 'Integración ERP – planta / MES', val: 1 },
+                { label: 'Planeación o ejecución de producción', val: 1 },
+                { label: 'Inventarios / almacenes / WMS', val: 1 },
+                { label: 'Transferencia de archivos entre sistemas', val: 1 },
+                { label: 'Procesos financieros o cierres', val: 1 },
+                { label: 'Reportes operativos o regulatorios', val: 1 },
+                { label: 'Integración con clientes / proveedores', val: 1 },
+                { label: 'Otro', val: 0 }
+            ]},
+            { id: 'b4_incidents', block: 'Impacto y criticidad', text: '¿En los últimos 12 meses han tenido incidentes operativos relacionados con fallas de integración, ejecución manual o falta de visibilidad?', type: 'standard', maxPts: 4, options: [
+                { label: 'Sí, varios con impacto relevante', val: 4 },
+                { label: 'Sí, algunos con impacto moderado', val: 3 },
+                { label: 'Sí, pero menores', val: 2 },
+                { label: 'No', val: 0 },
+                { label: 'No lo sé / prefiero no responder', val: 2 }
+            ]},
+
+            // --- Bloque 5. Prioridad y disposición ---
+            { id: 'b5_priority', block: 'Prioridad y disposición', text: '¿Qué prioridad tiene para su empresa mejorar la automatización y visibilidad de procesos críticos en los próximos 12 meses?', type: 'standard', maxPts: 6, options: [
+                { label: 'Muy alta', val: 6 },
+                { label: 'Alta', val: 5 },
+                { label: 'Media', val: 3 },
+                { label: 'Baja', val: 1 },
+                { label: 'Ninguna por ahora', val: 0 }
+            ]},
+            { id: 'b5_initiatives', block: 'Prioridad y disposición', text: '¿Existe actualmente alguna iniciativa relacionada con alguno de estos temas?', type: 'multi', maxPts: 5, options: [
+                { label: 'Reducción de tareas manuales', val: 1 },
+                { label: 'Integración entre sistemas', val: 1 },
+                { label: 'Continuidad operativa / resiliencia', val: 1 },
+                { label: 'Modernización de ERP / SAP', val: 1 },
+                { label: 'Observabilidad / monitoreo operativo', val: 1 },
+                { label: 'Transformación digital / nube', val: 1 },
+                { label: 'No existe una iniciativa formal', val: 0, exclusive: true }
+            ]},
+            { id: 'b5_buyer', block: 'Prioridad y disposición', text: '¿Quién sería normalmente el área o rol que participa en este tipo de decisiones?', type: 'multi', maxPts: 4, options: [
+                { label: 'Dirección de Operaciones', val: 1 },
+                { label: 'Dirección / Gerencia de TI', val: 1 },
+                { label: 'Dirección General', val: 1 },
+                { label: 'Planta / Producción', val: 1 },
+                { label: 'Finanzas', val: 1 },
+                { label: 'No lo sé', val: 0, exclusive: true }
+            ]},
+
+            // --- Bloque 6. Preguntas abiertas (no suman al score, insumo IA) ---
+            { id: 'b6_challenge', block: 'Preguntas abiertas', text: 'En una frase o breve descripción, ¿cuál es hoy el mayor reto operativo o tecnológico que enfrenta su empresa en la ejecución de procesos críticos?', type: 'open', maxPts: 0, placeholder: 'Ej. Dependemos de un cron en producción que solo Juan entiende, y cuando falla nos enteramos por los clientes.' },
+            { id: 'b6_oneprocess', block: 'Preguntas abiertas', text: 'Si pudiera mejorar un solo proceso crítico este año, ¿cuál sería y por qué?', type: 'open', maxPts: 0, placeholder: 'Ej. La integración entre SAP y nuestro MES, porque hoy se atora 2 veces por semana y detiene producción.' }
         ];
 
-        const coreQuestions = [
-            { id: 'q1_financial', text: "Considerando la duración estimada de una interrupción en sus procesos clave, ¿qué nivel de pérdida financiera generaría para la organización?", type: 'standard', options: [{ label: "Afectación económica marginal o absorbible", val: 1 }, { label: "Costos moderados atribuibles a disminución de productividad", val: 2 }, { label: "Pérdidas financieras relevantes o riesgo de penalidades contractuales", val: 3 }, { label: "Impacto económico considerable con afectación a ingresos o al presupuesto operativo", val: 4 }, { label: "Pérdidas críticas que terminan en bajas en los clientes", val: 5 }] },
-            { id: 'q2_operational', text: "Si ocurre un incidente crítico en sus procesos clave, ¿Cuál sería el nivel de interrupción operativa a organización?", type: 'standard', options: [{ label: "Interrupción menor, con rápida recuperación operativa", val: 1 }, { label: "Afectación moderada al desempeño o a los tiempos de respuesta", val: 2 }, { label: "Paralización significativa de actividades esenciales", val: 3 }, { label: "Interrupción operativa severa que requiere monitoreo y gestión continua en tiempo real", val: 4 }] },
-            { id: 'q3_prioritization', text: "¿Cómo identifican y priorizan sus procesos críticos para continuidad?", type: 'standard', options: [{ label: "No están formalmente definidos", val: 1 }, { label: "Basado en experiencia del equipo", val: 2 }, { label: "Documentado en un BIA inicial o estructurado", val: 3 }, { label: "Basado en una evaluación de riesgos", val: 4 }, { label: "Mediante un análisis dinámico o automatizado de riesgos tomando en cuenta BIA", val: 5 }] },
-            { id: 'q4_rto', text: "Para sus procesos críticos, el RTO definido es:", type: 'standard', options: [{ label: "No existe RTO definido", val: 1 }, { label: "Mayor a 72 horas", val: 2 }, { label: "Entre 24 y 72 horas", val: 3 }, { label: "Menor a 24 horas", val: 4 }, { label: "RTO por proceso, monitoreado y alertado automáticamente", val: 5 }] },
-            { id: 'q5_rpo', text: "En caso de incidente, la pérdida aceptable de información es:", type: 'standard', options: [{ label: "No se ha definido", val: 1 }, { label: "Mayor a 24 horas", val: 2 }, { label: "Menor a 24 horas", val: 3 }, { label: "Menor a 4 horas", val: 4 }, { label: "RPO controlado, validado y monitoreado automáticamente", val: 5 }] },
-            { id: 'q6_recovery', text: "La recuperación de sistemas críticos es principalmente:", type: 'standard', options: [{ label: "Manual y reactiva", val: 1 }, { label: "Documentada pero manual", val: 2 }, { label: "Parcialmente automatizada", val: 3 }, { label: "Mayormente automatizada", val: 4 }, { label: "Orquestada y ejecutada automáticamente según evento", val: 5 }] },
-            { id: 'q7_responsibility', text: "Si ocurre una falla grave, la responsabilidad de recuperación recae en:", type: 'standard', options: [{ label: "Una sola persona", val: 1 }, { label: "Un equipo reducido", val: 2 }, { label: "Comité definido con roles claros", val: 3 }, { label: "Comité con documentación compartida", val: 4 }, { label: "Gobierno distribuido con visibilidad centralizada en tiempo real", val: 5 }] },
-            { id: 'q8_tests', text: "¿Con qué frecuencia se prueban los planes BCP/DRP?", type: 'standard', options: [{ label: "Nunca", val: 1 }, { label: "Solo después de un incidente", val: 2 }, { label: "Anualmente", val: 3 }, { label: "Varias veces al año", val: 4 }, { label: "Pruebas continuas y validación automática", val: 5 }] },
-            { id: 'q9_detection', text: "¿Cómo detectan riesgos de interrupción antes de que ocurran?", type: 'standard', options: [{ label: "No se detectan, se reacciona", val: 1 }, { label: "Alertas manuales o aisladas", val: 2 }, { label: "Dashboards operativos", val: 3 }, { label: "Monitoreo centralizado de continuidad", val: 4 }, { label: "Monitoreo proactivo automático por proceso crítico", val: 5 }] }
-        ];
+        // Puntaje máximo total = suma de maxPts.
+        const MAX_TOTAL_SCORE = diagnosticQuestions.reduce((acc, q) => acc + (q.maxPts || 0), 0);
 
         const funFacts = [
-            "El 93% de las empresas que pierden su data center por 10 días quiebran en un año.",
-            "El costo promedio de inactividad es de $5,600 USD por minuto.",
-            "60% de las PyMEs cierran tras 6 meses de un ciberataque grave.",
-            "Solo el 54% de las empresas tienen un plan de recuperación ante desastres formal.",
-            "El error humano causa el 23% de las brechas de seguridad y pérdida de datos."
+            "Las empresas con automatización orquestada reducen incidentes operativos hasta en un 70%.",
+            "El 60% de las fallas operativas se originan en scripts mantenidos por una sola persona.",
+            "Solo el 27% de las organizaciones tiene visibilidad end-to-end de sus procesos de negocio.",
+            "La falta de observabilidad incrementa el MTTR (tiempo de respuesta) hasta 5 veces.",
+            "Cada hora de paro de un proceso crítico cuesta en promedio $260,000 USD a empresas medianas."
         ];
 
         let activeQuestions = [];
         let currentStep = 0;
         let answers = {};
         let currentCalculatedScore = 0;
-        let currentMaxScore = 50; 
+        let currentMaxScore = MAX_TOTAL_SCORE;
         let currentRiskLevel = '';
-        
+
         // ID asignado por el backend en el Paso 1
         let currentFirebaseLeadId = null;
 
-        let currentUserName = ''; 
+        let currentUserName = '';
         let currentCompany = '';
-        let currentEmail = ''; 
+        let currentEmail = '';
 
         window.heroSection = document.getElementById('hero-section');
         window.wizardSection = document.getElementById('wizard-section');
@@ -380,11 +497,11 @@
         window.factTicker = document.getElementById('fun-fact-ticker');
         window.startModal = document.getElementById('start-modal');
         window.phoneModal = document.getElementById('phone-modal');
-        
+
         window.init = function() {
             const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', dateOpts);
-            
+
             let factIdx = 0;
             factTicker.textContent = funFacts[0];
             setInterval(() => {
@@ -410,7 +527,7 @@
             startModal.classList.remove('hidden');
             setTimeout(() => document.getElementById('user-name-input').focus(), 100);
         }
-        
+
         window.closeStartModal = function() { startModal.classList.add('hidden'); }
         window.handleStartFormKeypress = function(e) { if (e.key === 'Enter') submitStartForm(); }
 
@@ -445,7 +562,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     currentFirebaseLeadId = data.leadId; // Guardamos la llave para el paso 2
-                    
+
                     currentUserName = nameVal;
                     currentCompany = companyVal;
                     currentEmail = emailVal;
@@ -468,7 +585,7 @@
         window.startAssessment = function() {
             heroSection.classList.add('hidden');
             wizardSection.classList.remove('hidden');
-            activeQuestions = [...prospectingQuestions, ...coreQuestions];
+            activeQuestions = [...diagnosticQuestions];
             currentStep = 0;
             answers = {};
             renderQuestion();
@@ -493,30 +610,179 @@
                 </div>`;
             }
 
-            html += `<h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3><div class="mb-8"></div><div class="grid grid-cols-1 gap-3">`;
-            q.options.forEach((opt, idx) => {
-                const labelArg = opt.label.replace(/'/g, "\\'");
-                const isSelected = savedAnswer && savedAnswer.value === opt.val;
-                const borderClasses = isSelected ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 shadow-md' : 'border-slate-100 bg-white hover:border-blue-500 hover:shadow-lg';
-                const circleClasses = isSelected ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600';
+            // Bloque (chip pequeño arriba del título) y enunciado
+            const helperByType = {
+                multi: 'Selecciona todas las que apliquen.',
+                open: 'Respuesta abierta.',
+                standard: 'Selecciona una opción.'
+            };
 
+            html += `
+                <div class="mb-4">
+                    <span class="inline-block text-[10px] font-bold tracking-widest uppercase text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-1">${q.block}</span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">${q.text}</h3>
+                <p class="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-6">${helperByType[q.type] || ''}</p>
+            `;
+
+            if (q.type === 'standard') {
+                html += `<div class="grid grid-cols-1 gap-3">`;
+                q.options.forEach((opt, idx) => {
+                    const labelArg = opt.label.replace(/'/g, "\\'");
+                    const isSelected = savedAnswer && savedAnswer.value === opt.val && savedAnswer.label === opt.label;
+                    const borderClasses = isSelected ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 shadow-md' : 'border-slate-100 bg-white hover:border-blue-500 hover:shadow-lg';
+                    const circleClasses = isSelected ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600';
+
+                    html += `
+                        <div onclick="selectAnswer('${q.id}', ${opt.val}, '${labelArg}')"
+                             class="cursor-pointer group relative border-2 rounded-xl p-4 transition flex items-center h-full ${borderClasses}">
+                            <div class="w-8 h-8 rounded-full flex flex-shrink-0 items-center justify-center font-bold mr-4 transition-colors ${circleClasses}">${idx + 1}</div>
+                            <span class="text-slate-700 font-medium text-left">${opt.label}</span>
+                        </div>`;
+                });
+                html += `</div>`;
+            } else if (q.type === 'multi') {
+                const selectedSet = (savedAnswer && Array.isArray(savedAnswer.selected)) ? new Set(savedAnswer.selected) : new Set();
+                html += `<div class="grid grid-cols-1 gap-3" id="multi-options-${q.id}">`;
+                q.options.forEach((opt, idx) => {
+                    const labelArg = opt.label.replace(/'/g, "\\'");
+                    const isSelected = selectedSet.has(opt.label);
+                    const borderClasses = isSelected ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 shadow-md' : 'border-slate-100 bg-white hover:border-blue-500 hover:shadow-lg';
+                    const checkClasses = isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-transparent border-slate-300 group-hover:border-blue-400';
+                    const checkIcon = isSelected ? 'check' : '';
+
+                    html += `
+                        <div onclick="toggleMulti('${q.id}', ${idx})"
+                             class="cursor-pointer group relative border-2 rounded-xl p-4 transition flex items-center h-full ${borderClasses}"
+                             data-multi-card="${idx}">
+                            <div class="w-7 h-7 rounded-md border-2 flex flex-shrink-0 items-center justify-center font-bold mr-4 transition-colors ${checkClasses}">
+                                <span class="material-symbols-outlined text-base">${checkIcon}</span>
+                            </div>
+                            <span class="text-slate-700 font-medium text-left">${opt.label}</span>
+                        </div>`;
+                });
+                html += `</div>`;
                 html += `
-                    <div onclick="selectAnswer('${q.id}', ${opt.val}, '${labelArg}')" 
-                         class="cursor-pointer group relative border-2 rounded-xl p-4 transition flex items-center h-full ${borderClasses}">
-                        <div class="w-8 h-8 rounded-full flex flex-shrink-0 items-center justify-center font-bold mr-4 transition-colors ${circleClasses}">${idx + 1}</div>
-                        <span class="text-slate-700 font-medium text-left">${opt.label}</span>
+                    <div class="mt-8 flex justify-end">
+                        <button id="btn-multi-next" onclick="submitMulti('${q.id}')"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-blue-200 flex items-center gap-2 group disabled:opacity-40 disabled:cursor-not-allowed"
+                                ${selectedSet.size === 0 ? 'disabled' : ''}>
+                            Continuar <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </button>
                     </div>`;
-            });
-            html += `</div>`;
+            } else if (q.type === 'open') {
+                const savedText = (savedAnswer && typeof savedAnswer.label === 'string') ? savedAnswer.label.replace(/"/g, '&quot;') : '';
+                html += `
+                    <textarea id="open-input-${q.id}" maxlength="600" rows="6" placeholder="${q.placeholder || ''}"
+                              oninput="onOpenInput('${q.id}')"
+                              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-blue-500 outline-none transition text-sm text-slate-700 leading-relaxed resize-none">${savedText}</textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-slate-400"><span id="open-counter-${q.id}">${savedText.length}</span> / 600</span>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button onclick="skipOpen('${q.id}')"
+                                class="text-slate-500 hover:text-slate-700 px-4 py-3 rounded-xl font-medium transition text-sm">
+                            Omitir
+                        </button>
+                        <button id="btn-open-next" onclick="submitOpen('${q.id}')"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-blue-200 flex items-center gap-2 group disabled:opacity-40 disabled:cursor-not-allowed"
+                                ${savedText.trim().length === 0 ? 'disabled' : ''}>
+                            ${currentStep === activeQuestions.length - 1 ? 'Finalizar' : 'Continuar'}
+                            <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </button>
+                    </div>`;
+            }
+
             questionCard.innerHTML = html;
         }
 
+        // --- Handlers para preguntas tipo 'standard' ---
         window.selectAnswer = function(qid, val, label) {
             answers[qid] = { value: val, label: label };
             safeLogEvent('question_answered', { question_id: qid, answer_value: val });
+            advanceOrFinish();
+        }
+
+        // --- Handlers para preguntas tipo 'multi' ---
+        window.toggleMulti = function(qid, idx) {
+            const q = activeQuestions.find(x => x.id === qid);
+            if (!q) return;
+            const opt = q.options[idx];
+
+            let current = (answers[qid] && Array.isArray(answers[qid].selected)) ? [...answers[qid].selected] : [];
+
+            // Si la opción es exclusiva (ej. "No lo sé", "Ninguno"), reemplaza todo.
+            if (opt.exclusive) {
+                if (current.includes(opt.label)) {
+                    current = [];
+                } else {
+                    current = [opt.label];
+                }
+            } else {
+                // Si había exclusiva seleccionada, removerla al elegir cualquier otra.
+                const exclusiveLabels = q.options.filter(o => o.exclusive).map(o => o.label);
+                current = current.filter(l => !exclusiveLabels.includes(l));
+
+                if (current.includes(opt.label)) {
+                    current = current.filter(l => l !== opt.label);
+                } else {
+                    current.push(opt.label);
+                }
+            }
+
+            // Calcular value sumado con cap a q.maxPts
+            const sum = current.reduce((acc, lbl) => {
+                const o = q.options.find(o => o.label === lbl);
+                return acc + (o ? o.val : 0);
+            }, 0);
+            const capped = Math.min(sum, q.maxPts);
+
+            answers[qid] = {
+                value: capped,
+                label: current.length > 0 ? current.join(' • ') : 'Sin selección',
+                selected: current
+            };
+
+            renderQuestion();
+        }
+
+        window.submitMulti = function(qid) {
+            if (!answers[qid] || !answers[qid].selected || answers[qid].selected.length === 0) return;
+            safeLogEvent('question_answered', { question_id: qid, answer_value: answers[qid].value });
+            advanceOrFinish();
+        }
+
+        // --- Handlers para preguntas tipo 'open' ---
+        window.onOpenInput = function(qid) {
+            const input = document.getElementById('open-input-' + qid);
+            const counter = document.getElementById('open-counter-' + qid);
+            const btn = document.getElementById('btn-open-next');
+            const txt = input.value;
+            counter.textContent = txt.length;
+            if (btn) btn.disabled = txt.trim().length === 0;
+            // Guardamos en caliente para preservar al volver
+            answers[qid] = { value: 0, label: txt.trim() || 'Sin respuesta' };
+        }
+
+        window.submitOpen = function(qid) {
+            const input = document.getElementById('open-input-' + qid);
+            const txt = (input.value || '').trim();
+            if (txt.length === 0) return;
+            answers[qid] = { value: 0, label: txt.substring(0, 600) };
+            safeLogEvent('question_answered', { question_id: qid, answer_value: 0 });
+            advanceOrFinish();
+        }
+
+        window.skipOpen = function(qid) {
+            answers[qid] = { value: 0, label: 'Sin respuesta' };
+            safeLogEvent('question_skipped', { question_id: qid });
+            advanceOrFinish();
+        }
+
+        function advanceOrFinish() {
             if (currentStep < activeQuestions.length - 1) {
                 currentStep++;
-                setTimeout(renderQuestion, 200);
+                setTimeout(renderQuestion, 180);
             } else {
                 finishAssessment();
             }
@@ -540,18 +806,20 @@
 
         window.calculateResults = function() {
             let totalPoints = 0;
-            coreQuestions.forEach(q => {
-                if (answers[q.id]) totalPoints += answers[q.id].value;
+            diagnosticQuestions.forEach(q => {
+                if (answers[q.id] && typeof answers[q.id].value === 'number') {
+                    totalPoints += answers[q.id].value;
+                }
             });
             currentCalculatedScore = totalPoints;
             document.getElementById('display-user-name').textContent = currentUserName;
-            updateDashboard(totalPoints, 50);
+            updateDashboard(totalPoints, MAX_TOTAL_SCORE);
         }
 
         window.updateDashboard = function(score, maxScore) {
             document.getElementById('final-score').textContent = score;
             document.getElementById('max-possible-score').textContent = maxScore;
-            
+
             const circle = document.getElementById('score-circle');
             const offset = 552 - ((score / maxScore) * 552);
             setTimeout(() => { circle.style.strokeDashoffset = offset; }, 500);
@@ -560,27 +828,37 @@
             const desc = document.getElementById('score-description');
             const pitch = document.getElementById('pitch-text');
 
-            if (score < 20) {
-                currentRiskLevel = 'Crítico';
-                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700";
-                badge.textContent = "Nivel Crítico";
-                circle.classList.add('text-red-600'); circle.classList.remove('text-blue-600');
-                desc.textContent = "Su organización opera bajo un riesgo inminente.";
-                pitch.textContent = "Un incidente menor podría convertirse en una crisis mayor.";
-            } else if (score <= 35) {
-                currentRiskLevel = 'En Desarrollo';
-                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700";
-                badge.textContent = "En Desarrollo";
-                circle.classList.add('text-orange-500'); circle.classList.remove('text-blue-600');
-                desc.textContent = "Falta integración y pruebas en su plan.";
-                pitch.textContent = "BCMEX le ayuda a llevar su plan del papel a la práctica.";
-            } else {
-                currentRiskLevel = 'Madurez Alta';
+            // Limpieza de colores previos
+            circle.classList.remove('text-red-600', 'text-orange-500', 'text-green-500', 'text-blue-600');
+
+            if (score >= 80) {
+                currentRiskLevel = 'Lead Calificado';
                 badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700";
-                badge.textContent = "Madurez Alta";
-                circle.classList.add('text-green-500'); circle.classList.remove('text-blue-600');
-                desc.textContent = "Excelente nivel de madurez y proactividad.";
-                pitch.textContent = "Manténgase afilado con los servicios de BCMEX.";
+                badge.textContent = "Lead Altamente Calificado";
+                circle.classList.add('text-green-500');
+                desc.textContent = "Dolor claro, procesos críticos, baja observabilidad y prioridad alta. Candidato para contacto comercial inmediato.";
+                pitch.textContent = "BCMEX puede orquestar y dar observabilidad a sus procesos críticos con Control-M en pocas semanas.";
+            } else if (score >= 60) {
+                currentRiskLevel = 'Lead Viable';
+                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700";
+                badge.textContent = "Lead Viable";
+                circle.classList.add('text-blue-600');
+                desc.textContent = "Oportunidad real que requiere un discovery o workshop de diagnóstico. Nurturing corto y seguimiento.";
+                pitch.textContent = "Un workshop de diagnóstico BCMEX traduce su realidad operativa en un roadmap de automatización accionable.";
+            } else if (score >= 40) {
+                currentRiskLevel = 'Lead Potencial';
+                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700";
+                badge.textContent = "Lead Potencial";
+                circle.classList.add('text-orange-500');
+                desc.textContent = "Existe necesidad, pero aún no es suficientemente madura. Conviene nutrir con contenido y recontactar.";
+                pitch.textContent = "BCMEX le ayuda a estructurar el caso de negocio antes de invertir en una plataforma de orquestación.";
+            } else {
+                currentRiskLevel = 'Baja Prioridad';
+                badge.className = "px-4 py-1 rounded-full text-sm font-bold bg-slate-100 text-slate-700";
+                badge.textContent = "Baja Prioridad";
+                circle.classList.add('text-red-600');
+                desc.textContent = "Baja complejidad, bajo dolor o baja urgencia. No prioritario para inversión comercial directa por ahora.";
+                pitch.textContent = "Cuando su operación escale y dependa de más integraciones, BCMEX estará listo para acompañarle.";
             }
         }
 
@@ -594,19 +872,28 @@
         // --- PASO 2: ACTUALIZAR EL LEAD CON TELÉFONO Y RESPUESTAS ---
         window.submitWithPhone = async function() {
             const phone = document.getElementById('user-phone-input').value.trim();
-            
+
             // Validación estricta: Empieza con + seguido de 10 a 15 números
             if (!/^\+[0-9]{10,15}$/.test(phone)) {
                 return alert("El número debe incluir tu código de país (+lada) y ser válido (ej. +528112233445).");
             }
-            
+
             const btnSubmit = document.getElementById('btn-submit-phone');
             const btnClose = document.getElementById('btn-close-phone');
             const originalText = btnSubmit.innerHTML;
-            
+
             btnSubmit.innerHTML = `<span class="animate-spin material-symbols-outlined">progress_activity</span> Enviando...`;
             btnSubmit.disabled = true;
             btnClose.disabled = true;
+
+            // Sanitizar answers para backend: solo {value, label} por pregunta.
+            const flatAnswers = {};
+            Object.keys(answers).forEach(k => {
+                flatAnswers[k] = {
+                    value: typeof answers[k].value === 'number' ? answers[k].value : 0,
+                    label: String(answers[k].label || 'Sin respuesta').substring(0, 600)
+                };
+            });
 
             try {
                 const response = await fetch('/api/guardar-lead', {
@@ -618,7 +905,7 @@
                         phone: phone,
                         score: currentCalculatedScore,
                         level: currentRiskLevel,
-                        answers: answers
+                        answers: flatAnswers
                     })
                 });
 

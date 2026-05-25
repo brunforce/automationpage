@@ -9,33 +9,33 @@ const crypto = require('crypto'); // Módulo nativo para evitar Timing Attacks
 // ==========================================
 
 const ALLOWED_ORIGINS = [
-  'https://bcpscore.vercel.app',
-  'https://bcpscore2.vercel.app'
+  'https://automationpage.vercel.app'
 ];
 
-const VALID_LEVELS = ['Crítico', 'En Desarrollo', 'Madurez Alta'];
+const VALID_LEVELS = ['Lead Calificado', 'Lead Viable', 'Lead Potencial', 'Baja Prioridad'];
 const MAX_ANSWERS = 30;
 const MAX_LABEL_LENGTH = 300;
 const SCORE_MIN = 0;
-const SCORE_MAX = 50;
+const SCORE_MAX = 100;
 
 // MAPA DE PREGUNTAS (Para formatear el correo interno)
 const QUESTION_MAP = {
-  p1_market: "¿Cuál es la participación de mercado de su empresa en el país?",
-  p2_employees: "¿Cuántas personas participan directamente en la operación diaria del negocio?",
-  p3_dependency: "¿Qué tan dependiente es su operación de sistemas digitales para generar ingresos?",
-  p4_systems: "¿Cuántos sistemas o aplicaciones son críticos para la operación diaria?",
-  p5_impact: "Una interrupción tecnológica impactaría principalmente en:",
-  p6_team: "¿Existe un equipo o área responsable de continuidad, riesgos o tecnología?",
-  q1_financial: "Considerando la duración estimada de una interrupción en sus procesos clave, ¿qué nivel de pérdida financiera generaría para la organización?",
-  q2_operational: "Si ocurre un incidente crítico en sus procesos clave, ¿Cuál sería el nivel de interrupción operativa a organización?",
-  q3_prioritization: "¿Cómo identifican y priorizan sus procesos críticos para continuidad?",
-  q4_rto: "Para sus procesos críticos, el RTO definido es:",
-  q5_rpo: "En caso de incidente, la pérdida aceptable de información es:",
-  q6_recovery: "La recuperación de sistemas críticos es principalmente:",
-  q7_responsibility: "Si ocurre una falla grave, la responsabilidad de recuperación recae en:",
-  q8_tests: "¿Con qué frecuencia se prueban los planes BCP/DRP?",
-  q9_detection: "¿Cómo detectan riesgos de interrupción antes de que ocurran?"
+  b1_size: "¿Cuál es el tamaño aproximado de su operación en México?",
+  b1_sites: "¿Cuántas plantas, centros de distribución o sitios operativos tiene su empresa?",
+  b1_systems: "¿Qué sistemas utiliza hoy para soportar su operación crítica?",
+  b2_execution: "¿Cómo se ejecutan hoy la mayoría de sus procesos operativos críticos entre sistemas?",
+  b2_dependency: "¿Su empresa depende actualmente de scripts, tareas programadas, cron jobs o desarrollos puntuales mantenidos por una o pocas personas?",
+  b2_pains: "¿Con qué frecuencia ocurre alguno de estos problemas en sus procesos críticos?",
+  b3_visibility: "¿Qué nivel de visibilidad tiene hoy sobre el estado de sus procesos críticos de negocio?",
+  b3_mttr: "Cuando un proceso crítico falla, ¿qué tan rápido puede su equipo identificar la causa y responder?",
+  b4_impact: "Si uno de sus procesos críticos se detiene durante una hora, ¿qué impacto tendría?",
+  b4_critical: "¿Cuáles de estos procesos considera críticos para su operación?",
+  b4_incidents: "¿En los últimos 12 meses han tenido incidentes operativos relacionados con fallas de integración, ejecución manual o falta de visibilidad?",
+  b5_priority: "¿Qué prioridad tiene para su empresa mejorar la automatización y visibilidad de procesos críticos en los próximos 12 meses?",
+  b5_initiatives: "¿Existe actualmente alguna iniciativa relacionada con alguno de estos temas?",
+  b5_buyer: "¿Quién sería normalmente el área o rol que participa en este tipo de decisiones?",
+  b6_challenge: "En una frase o breve descripción, ¿cuál es hoy el mayor reto operativo o tecnológico que enfrenta su empresa en la ejecución de procesos críticos?",
+  b6_oneprocess: "Si pudiera mejorar un solo proceso crítico este año, ¿cuál sería y por qué?"
 };
 
 // ==========================================
@@ -247,7 +247,9 @@ async function procesarIAyCorreo(data, dbKey, reqHost, modelName = "gemini-2.5-f
 
     const respuestas = data.answers || {};
     for (const [key, answerObj] of Object.entries(respuestas)) {
-      const shortId = key.split('_')[0].toUpperCase();
+      // shortId = key completa en mayúsculas (ej. b1_size → B1_SIZE) para casar con {{Respuesta B1_SIZE}} en prompt.txt.
+      // Las preguntas viejas BCP tenían prefijo único por pregunta (p1_, q1_, ...), las nuevas se agrupan por bloque (b1_size, b1_sites...).
+      const shortId = key.toUpperCase();
       const label = typeof answerObj === 'object' ? answerObj.label : String(answerObj);
       const regex = new RegExp(`{{Respuesta ${shortId}}}`, 'g');
       promptText = promptText.replace(regex, sanitizeForPrompt(label, MAX_LABEL_LENGTH));
@@ -349,7 +351,7 @@ async function procesarIAyCorreo(data, dbKey, reqHost, modelName = "gemini-2.5-f
         const safePhone = escapeHtml(data.phone);
         
         // Creamos la URL segura y CODIFICAMOS el token para evitar que el símbolo '#' lo rompa
-        const host = reqHost || 'bcpscore.vercel.app';
+        const host = reqHost || 'automationpage.vercel.app';
         const retrySecret = process.env.RETRY_SECRET || process.env.API_SECRET || '';
         const encodedToken = encodeURIComponent(retrySecret); // ← ¡AQUÍ ESTÁ LA MAGIA PARA EL SIMBOLO #!
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
